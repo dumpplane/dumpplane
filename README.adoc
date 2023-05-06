@@ -138,7 +138,7 @@ NOTE: `nginx -T` output file name used as a primary key, which means if same fil
 
 === Step 5: nginx management & governance
 
-Refer to below sections for details.
+Refer to link:#nginx-management-governance[NGINX Management & Governance].
 
 == NGINX Management & Governance
 
