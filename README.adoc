@@ -31,12 +31,12 @@ input:
 
 == Prerequisites for run dumpplane
 
-=== MongoDB
+=== mongodb
 
 This section including steps to setup MongoDB on local machine.
 
 [source, bash]
-.*1. Cfreate DBpath*
+.*1. Create DBpath*
 ----
 mkdir nginx
 ----
@@ -63,7 +63,7 @@ Using Mongosh:		1.6.1
 use nginx
 ----
 
-=== Java
+=== java
 
 [source, bash]
 .*Java Runtime time V11 or above version*
