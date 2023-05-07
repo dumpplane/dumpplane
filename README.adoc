@@ -1,7 +1,6 @@
 image:ext/dumpplane-logo.png[Dumpplane logo]
-<h1 align="center">DUMP PLANE</h1>
-<h3 align="center">Operate NGINX Easy</h3>
 
+= NGINX Dump Plane
 :toc: manual
 
 == What's dumpplane?
