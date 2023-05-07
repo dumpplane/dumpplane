@@ -1,7 +1,7 @@
-image:ext/dumpplane-logo.png[Dumpplane logo]
-
 = NGINX Dump Plane
 :toc: manual
+
+image:ext/dumpplane-logo.png[Dumpplane logo]
 
 == What's dumpplane?
 
