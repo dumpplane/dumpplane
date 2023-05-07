@@ -15,6 +15,7 @@ import com.mongodb.client.MongoClients;
 import io.github.cloudadc.dumpplane.hander.CrossplaneHander;
 import io.github.cloudadc.dumpplane.hander.DumpPersistHander;
 import io.github.cloudadc.dumpplane.hander.ParseHander;
+import io.github.cloudadc.dumpplane.hander.ValidationHander;
 import io.github.cloudadc.dumpplane.hander.DumpSplitHander;
 import io.github.cloudadc.dumpplane.hander.Hander;
 import io.github.cloudadc.dumpplane.model.Configuration;
@@ -85,6 +86,8 @@ public class Main implements CommandLineRunner {
 					File file = Paths.get(crossplanoutput, config.getDumpFileName()+ ".json").toFile();
 					CrossplaneHander.newInstance(file).execute(config);
 					
+					ValidationHander.newInstance().execute(config);
+					
 					dump.dumpToMongoDB(config, mongoClient);
 				}
 			}			
@@ -105,7 +108,7 @@ public class Main implements CommandLineRunner {
 		System.out.println("options:");
 		System.out.println("  -h, --help            show this help message and exit");
 		System.out.println("  -V, --version         show program's version number and exit");
-		System.out.println("  --output              set dumpplane output file path. default " + Hander.DISK_PATH);
+		System.out.println("  --output              set dumpplane output file path, default " + Hander.DISK_PATH);
 		System.out.println("  --cpout               set crossplane(https://github.com/nginxinc/crossplane) parse output file path. default same as dumpplane output");
 		System.out.println("                            suggest crossplane commands is for i in $(ls data/) ; do crossplane parse -o data/$i.json data/$i/nginx.conf; done ");
 		System.out.println("  --uri                 mongodb connection string, default mongodb://127.0.0.1:27017, refer to https://www.mongodb.com/docs/manual/reference/connection-string/ for details" );

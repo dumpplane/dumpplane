@@ -3,7 +3,6 @@ package io.github.cloudadc.dumpplane.hander;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Paths;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -38,13 +37,6 @@ public class CrossplaneHander extends AbstractHander {
 		ObjectMapper mapper = new ObjectMapper();
 		Crossplane crossplane = mapper.readValue(rawCrossFile.getBytes(), Crossplane.class);
 		config.setCrossplane(crossplane);
-		
-		crossplane.getConfig().forEach(c -> {
-			
-			String prefix = Paths.get(config.getDiskPath(), config.getNgxHost()).toString();
-		
-			c.setFile(c.getFile().replace(prefix, config.getBasePath()));
-		});
 		
 	}
 
