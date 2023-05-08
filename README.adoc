@@ -144,4 +144,338 @@ Refer to link:#nginx-management-governance[NGINX Management & Governance].
 
 == NGINX Management & Governance
 
+=== Total NGINX Host
+
+[source, sql]
+----
+nginx> db.configurations.countDocuments()
+31
+----
+
+=== NGINX Configration Files View
+
+[source, sql]
+.*SQL*
+----
+var pipeline = [
+  {$addFields: 
+    {
+      status: '$crossplane.status',
+      errors: '$crossplane.errors',
+      config: '$crossplane.config'
+    }
+  }, 
+  {
+    $unwind: {
+      path: '$config',
+      includeArrayIndex: 'row',
+      preserveNullAndEmptyArrays: true
+    }
+  }, 
+  {
+    $addFields: {
+      fileStatus: '$config.status',
+      content: '$config.parsed',
+      filePath: '$config.file'
+    }
+  }, 
+  {
+    $project: {
+      crossplane: 0,
+      dumpplane: 0,
+      config: 0
+    }
+  }
+]
+----
+
+[source, sql]
+.*Create View*
+----
+db.createView("configurationFiles", "configurations", pipeline)
+----
+
+=== Total NGINX Configration Files
+
+[source, sql]
+----
+> db.configurationFiles.countDocuments()
+154
+----
+
+=== Top 5 configuration files with the most configuration blocks
+
+[source, sql]
+.*SQL*
+----
+var pipeline = [
+  {
+    $addFields: {
+      totalBlocks: {
+        $size: '$content'
+      }
+    }
+  }, 
+  {
+    $sort: {
+      totalBlocks: -1
+    }
+  }, 
+  {
+    $limit: 5
+  }, 
+  {
+    $project: {
+      _id: 0,
+      ngxHost: 1,
+      filePath: 1,
+      totalBlocks: 1
+    }
+  }
+]
+----
+
+[source, sql]
+.*Aggregate*
+----
+> db.configurationFiles.aggregate(pipeline)
+[
+  {
+    ngxHost: '15.55.40.185',
+    filePath: '/etc/nginx/conf.d/app.conf',
+    totalBlocks: 11
+  },
+  {
+    ngxHost: '104.3.42.121',
+    filePath: '/etc/nginx/conf.d/app.conf',
+    totalBlocks: 10
+  },
+  {
+    ngxHost: '103.10.16.101',
+    filePath: '/etc/nginx/conf.d/app.conf',
+    totalBlocks: 9
+  },
+  {
+    ngxHost: '10.1.10.195',
+    filePath: '/etc/nginx/nginx.conf',
+    totalBlocks: 9
+  },
+  {
+    ngxHost: '10.1.10.171',
+    filePath: '/etc/nginx/nginx.conf',
+    totalBlocks: 6
+  }
+]
+----
+
+=== Top 5 NGINX hosts with the most number of configuration files
+
+[source, sql]
+.*SQL*
+----
+var pipeline = [
+  {
+    $group: {
+      _id: '$ngxHost',
+      count: {
+        $count: {}
+      }
+    }
+  }, 
+  {
+    $sort: {
+      count: -1
+    }
+  },
+  {
+    $limit: 5
+  } 
+]
+----
+
+[source, sql]
+.*Aggregate*
+----
+> db.configurationFiles.aggregate(pipeline)
+[
+  { _id: '10.1.10.195', count: 58 },
+  { _id: '10.1.10.8', count: 8 },
+  { _id: '10.1.10.171', count: 6 },
+  { _id: '192.168.1.103', count: 3 },
+  { _id: '10.1.10.103', count: 3 }
+]
+----
+
+=== NGINX Configration Blocks View
+
+[source, sql]
+.*SQL*
+----
+var pipeline = [
+  {
+    $unwind: {
+      path: '$content',
+      includeArrayIndex: 'blockRow',
+      preserveNullAndEmptyArrays: true
+    }
+  }, 
+  {
+    $addFields: {
+      blockLineNumber: '$content.line',
+      blockDirective: '$content.directive',
+      blockArgs: '$content.args',
+      blockIncludes: '$content.includes',
+      subBlock: '$content.block'
+    }
+  }, 
+  {$project: {
+      content: 0
+    }
+  }
+]
+----
+
+[source, sql]
+.*Create View*
+----
+db.createView("configurationBlocks", "configurationFiles", pipeline)
+----
+
+=== Total NGINX Configration Blocks
+
+[source, sql]
+----
+> db.configurationBlocks.countDocuments()
+414
+----
+
+=== Total NGINX Configration http Blocks
+
+[source, sql]
+----
+> db.configurationBlocks.find({ blockDirective: {$eq: "http"}}).count()
+31
+----
+
+=== Total NGINX Configration stream Blocks
+
+[source, sql]
+----
+> db.configurationBlocks.find({ blockDirective: {$eq: "stream"}}).count()
+1
+----
+
+=== Total NGINX Configration server Blocks
+
+[source, sql]
+----
+> db.configurationBlocks.find({ blockDirective: {$eq: "server"}}).count()
+129
+----
+
+=== Total NGINX Configration upstream  Blocks
+
+[source, sql]
+----
+> db.configurationBlocks.find({ blockDirective: {$eq: "upstream"}}).count()
+53
+----
+
+=== NGINX Configration Directives View
+
+[source, sql]
+.*SQL*
+----
+var pipeline = [
+  {
+    $unwind: {
+      path: '$subBlock',
+      includeArrayIndex: 'directiveBlockLineNumber',
+      preserveNullAndEmptyArrays: true
+    }
+  }, 
+  {
+    $addFields: {
+      directiveBlockLineNumber: '$subBlock.line',
+      directiveBlockDirective: '$subBlock.directive',
+      directiveBlockArgs: '$subBlock.args',
+      directiveBlockIncludes: '$subBlock.includes',
+      directiveSubBlock: '$subBlock.block'
+    }
+  }, 
+  {
+    $project: {
+      subBlock: 0
+    }
+  }
+]
+----
+
+[source, sql]
+----
+db.createView("configurationDirectives", "configurationBlocks", pipeline)
+----
+
+=== Totoal NGINX Configration Directives
+
+[source, sql]
+----
+> db.configurationDirectives.countDocuments()
+3542
+----
+
+=== Top 5 Frequent Used Port
+
+[source, sql]
+.*SQL*
+----
+var pipeline = [
+  {
+    $match: {
+      blockDirective: {
+        $eq: 'server'
+      },
+      directiveBlockDirective: {
+        $eq: 'listen'
+      }
+    }
+  }, 
+  {
+    $addFields: {
+      listenPort: {
+        $arrayElemAt: ['$directiveBlockArgs', 0]
+      }
+    }
+  }, 
+  {
+    $group: {
+      _id: '$listenPort',
+      count: {
+        $count: {}
+      }
+    }
+  }, 
+  {
+    $sort: {
+      count: -1
+    }
+  }, 
+  {
+    $limit: 5
+  }
+]
+----
+
+[source, sql]
+.*Aggregate*
+----
+> db.configurationDirectives.aggregate(pipeline)
+[
+  { _id: '8080', count: 14 },
+  { _id: '9006', count: 6 },
+  { _id: '9004', count: 6 },
+  { _id: '9000', count: 6 },
+  { _id: '9003', count: 5 }
+]
+----
 
