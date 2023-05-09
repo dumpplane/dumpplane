@@ -481,3 +481,271 @@ var pipeline = [
 ]
 ----
 
+=== NGINX go production configration validation
+
+[source, sql]
+.*1. Query all 3 host the the application go production related*
+----
+var pipeline = [
+{
+  $match: {
+    $and: [
+    {
+      directiveBlockDirective: { $eq: 'location'}
+    },
+    {
+      $or: [
+      {
+        ngxHost: {$eq: '10.55.140.71'}
+      },
+      {
+        ngxHost: {$eq: '10.55.140.72'}
+      },
+      {
+        ngxHost: {$eq: '10.55.140.73'}
+      }
+      ]
+    }
+    ]
+  }
+}, 
+{
+  $project: {
+    _id: 0,
+    ngxHost: 1,
+    filePath: 1,
+    blockDirective: 1,
+    directiveBlockDirective: 1,
+    configSize: {
+      $size: '$directiveSubBlock'
+    }
+  }
+}]
+----
+
+[source, sql]
+.*2. Find the difference*
+----
+> db.configurationDirectives.aggregate(pipeline)
+[
+  {
+    ngxHost: '10.55.140.72',
+    filePath: '/etc/nginx/conf.d/app.conf',
+    blockDirective: 'server',
+    directiveBlockDirective: 'location',
+    configSize: 2
+  },
+  {
+    ngxHost: '10.55.140.73',
+    filePath: '/etc/nginx/conf.d/app.conf',
+    blockDirective: 'server',
+    directiveBlockDirective: 'location',
+    configSize: 1
+  },
+  {
+    ngxHost: '10.55.140.71',
+    filePath: '/etc/nginx/conf.d/app.conf',
+    blockDirective: 'server',
+    directiveBlockDirective: 'location',
+    configSize: 2
+  }
+]
+----
+
+NOTE : Nginx on host `10.55.140.73` has 1 config items, the other has 2 items.
+
+
+[source, sql]
+.*3. SQL for find the configuration difference*
+----
+var pipeline = [
+{ 
+  $match: {
+    $and: [
+    { 
+      directiveBlockDirective: { $eq: 'location'}
+    },
+    { 
+      $or: [
+      { 
+        ngxHost: {$eq: '10.55.140.71'}
+      },
+      { 
+        ngxHost: {$eq: '10.55.140.72'}
+      },
+      { 
+        ngxHost: {$eq: '10.55.140.73'}
+      }
+      ]
+    }
+    ]
+  }
+},
+{
+   $unwind: {
+     path: '$directiveSubBlock',
+     includeArrayIndex: 'locationDirectiveRow',
+     preserveNullAndEmptyArrays: true
+  }
+},
+{
+  $project: {
+    _id: 0,
+    ngxHost: 1,
+    filePath: 1,
+    blockDirective: 1,
+    directiveBlockDirective: 1,
+    locationDirectiveRow: 1,
+    locationDirective: '$directiveSubBlock.directive',
+    locationDirectiveArgs: '$directiveSubBlock.args'
+  }
+}
+]
+----
+
+[source, sql]
+.*4. Find the difference*
+----
+> db.configurationDirectives.aggregate(pipeline)
+[
+  {
+    ngxHost: '10.55.140.72',
+    filePath: '/etc/nginx/conf.d/app.conf',
+    blockDirective: 'server',
+    directiveBlockDirective: 'location',
+    locationDirectiveRow: Long("0"),
+    locationDirective: 'status_zone',
+    locationDirectiveArgs: [ 'location_backend' ]
+  },
+  {
+    ngxHost: '10.55.140.72',
+    filePath: '/etc/nginx/conf.d/app.conf',
+    blockDirective: 'server',
+    directiveBlockDirective: 'location',
+    locationDirectiveRow: Long("1"),
+    locationDirective: 'proxy_pass',
+    locationDirectiveArgs: [ 'http://backend' ]
+  },
+  {
+    ngxHost: '10.55.140.73',
+    filePath: '/etc/nginx/conf.d/app.conf',
+    blockDirective: 'server',
+    directiveBlockDirective: 'location',
+    locationDirectiveRow: Long("0"),
+    locationDirective: 'proxy_pass',
+    locationDirectiveArgs: [ 'http://backend' ]
+  },
+  {
+    ngxHost: '10.55.140.71',
+    filePath: '/etc/nginx/conf.d/app.conf',
+    blockDirective: 'server',
+    directiveBlockDirective: 'location',
+    locationDirectiveRow: Long("0"),
+    locationDirective: 'status_zone',
+    locationDirectiveArgs: [ 'location_backend' ]
+  },
+  {
+    ngxHost: '10.55.140.71',
+    filePath: '/etc/nginx/conf.d/app.conf',
+    blockDirective: 'server',
+    directiveBlockDirective: 'location',
+    locationDirectiveRow: Long("1"),
+    locationDirective: 'proxy_pass',
+    locationDirectiveArgs: [ 'http://backend' ]
+  }
+]
+----
+
+NOTE: The `10.55.140.73` host lost the `status_zone` setting.
+
+=== NGINX Configration locations View
+
+[source, sql]
+.*SQL*
+----
+var pipeline = [
+  {
+    $match: {
+      directiveBlockDirective: {$eq: 'location' }
+    }
+  }, 
+  {
+    $unwind: {
+      path: '$directiveSubBlock',
+      includeArrayIndex: 'locationDirectiveRow',
+      preserveNullAndEmptyArrays: true
+    }
+  }, 
+  {
+    $addFields: {
+      locationDirective: '$directiveSubBlock.directive',
+      locationDirectiveArgs: '$directiveSubBlock.args',
+      locationDirectiveLine: '$directiveSubBlock.line'
+    }
+  }, 
+  {
+    $project: {
+      directiveSubBlock: 0
+    }
+  }
+]
+----
+
+[source, sql]
+.*Create View*
+----
+db.createView("configurationLocations", "configurationDirectives", pipeline)
+----
+
+=== Totoal Locations
+
+[source, sql]
+----
+> db.configurationLocations.countDocuments()
+338
+----
+
+=== Find the Different Location Configrtaion
+
+[source, sql]
+----
+> db.configurationLocations.find({$or: [{ngxHost: "15.55.140.71"}, {ngxHost: "15.55.140.72"}, {ngxHost: "15.55.140.73"}]},{_id: 0, ngxHost: 1, filePath: 1, blockDirective: 1, locationDirective: 1, locationDirectiveArgs: 1})
+[
+  {
+    ngxHost: '15.55.140.72',
+    filePath: '/etc/nginx/conf.d/app.conf',
+    blockDirective: 'server',
+    locationDirective: 'status_zone',
+    locationDirectiveArgs: [ 'location_backend' ]
+  },
+  {
+    ngxHost: '15.55.140.72',
+    filePath: '/etc/nginx/conf.d/app.conf',
+    blockDirective: 'server',
+    locationDirective: 'proxy_pass',
+    locationDirectiveArgs: [ 'http://backend' ]
+  },
+  {
+    ngxHost: '15.55.140.73',
+    filePath: '/etc/nginx/conf.d/app.conf',
+    blockDirective: 'server',
+    locationDirective: 'proxy_pass',
+    locationDirectiveArgs: [ 'http://backend' ]
+  },
+  {
+    ngxHost: '15.55.140.71',
+    filePath: '/etc/nginx/conf.d/app.conf',
+    blockDirective: 'server',
+    locationDirective: 'status_zone',
+    locationDirectiveArgs: [ 'location_backend' ]
+  },
+  {
+    ngxHost: '15.55.140.71',
+    filePath: '/etc/nginx/conf.d/app.conf',
+    blockDirective: 'server',
+    locationDirective: 'proxy_pass',
+    locationDirectiveArgs: [ 'http://backend' ]
+  }
+]
+----
+
