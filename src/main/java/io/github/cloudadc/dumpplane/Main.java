@@ -3,6 +3,8 @@ package io.github.cloudadc.dumpplane;
 import java.io.File;
 import java.nio.file.Paths;
 
+import org.apache.http.HttpHost;
+import org.elasticsearch.client.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -12,6 +14,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.json.jackson.JacksonJsonpMapper;
+import co.elastic.clients.transport.ElasticsearchTransport;
+import co.elastic.clients.transport.rest_client.RestClientTransport;
 import io.github.cloudadc.dumpplane.hander.CrossplaneHander;
 import io.github.cloudadc.dumpplane.hander.DumpPersistHander;
 import io.github.cloudadc.dumpplane.hander.ParseHander;
@@ -27,7 +33,7 @@ public class Main implements CommandLineRunner {
 
 	public static void main(String[] args) {
 		
-		//args = new String[] {"dump", "/Users/ksong/Downloads/conf"};
+		//args = new String[] {"dump", "--uri", "http://localhost:9200", "/Users/ksong/src/dumpplane/input"};
 		
 		//args = new String[] {"parse", "/Users/ksong/Downloads/conf"};
 
@@ -41,7 +47,7 @@ public class Main implements CommandLineRunner {
 			usage();
 		}
 		
-		String uri = "mongodb://127.0.0.1:27017";
+		String uri = "file://output";
 		String input = args[args.length - 1];
 		String output = Hander.DISK_PATH;
 		String crossplanoutput = output;
@@ -79,7 +85,30 @@ public class Main implements CommandLineRunner {
 			
 			DumpPersistHander dump = DumpPersistHander.newInstance();
 			
-			try (MongoClient mongoClient = MongoClients.create(uri)) {
+			if(uri.startsWith("mongodb")) {
+				
+				try (MongoClient mongoClient = MongoClients.create(uri)) {
+					
+					for(Configuration config : parse.getConfigs()) {
+						
+						File file = Paths.get(crossplanoutput, config.getDumpFileName()+ ".json").toFile();
+						CrossplaneHander.newInstance(file).execute(config);
+						
+						ValidationHander.newInstance().execute(config);
+						
+						dump.dumpToMongoDB(config, mongoClient);
+					}
+				}	
+			} else if (uri.startsWith("file")) {
+				if(!uri.startsWith("file://")) {
+					usage();
+				}
+				
+				String folder = uri.substring(7);
+				
+				if(!Paths.get(folder).toFile().exists()) {
+					Paths.get(folder).toFile().mkdir();
+				}
 				
 				for(Configuration config : parse.getConfigs()) {
 					
@@ -88,12 +117,35 @@ public class Main implements CommandLineRunner {
 					
 					ValidationHander.newInstance().execute(config);
 					
-					dump.dumpToMongoDB(config, mongoClient);
+					File finaFile = Paths.get(folder, config.getDumpFileName()+ ".json").toFile();
+					dump.dumpToFile(config, finaFile);
+					
+				}
+				
+				System.out.println("dump " + parse.getConfigs().size() + " configuration to " + uri);
+				
+			} else if (uri.startsWith("http")) {
+				
+				RestClient restClient = RestClient.builder(HttpHost.create(uri)).build();
+				
+				ElasticsearchTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper());
+				
+				ElasticsearchClient client = new ElasticsearchClient(transport);
+				
+				for(Configuration config : parse.getConfigs()) {
+					
+					File file = Paths.get(crossplanoutput, config.getDumpFileName()+ ".json").toFile();
+					CrossplaneHander.newInstance(file).execute(config);
+					
+					ValidationHander.newInstance().execute(config);
+					
+					dump.dumpToElastic(config, client);
+					
 				}
 			}			
-
 		}
 	
+		System.exit(0);
 		
 	}
 
@@ -111,7 +163,8 @@ public class Main implements CommandLineRunner {
 		System.out.println("  --output              set dumpplane output file path, default " + Hander.DISK_PATH);
 		System.out.println("  --cpout               set crossplane(https://github.com/nginxinc/crossplane) parse output file path. default same as dumpplane output");
 		System.out.println("                            suggest crossplane commands is for i in $(ls data/) ; do crossplane parse -o data/$i.json data/$i/nginx.conf; done ");
-		System.out.println("  --uri                 mongodb connection string, default mongodb://127.0.0.1:27017, refer to https://www.mongodb.com/docs/manual/reference/connection-string/ for details" );
+		System.out.println("  --uri                 dump string, default file://output, output is the final output dolder" );
+		System.out.println("                                     mongodb://127.0.0.1:27017, refer to https://www.mongodb.com/docs/manual/reference/connection-string/ for details" );
 		System.out.println();
 		System.out.println("input:");
 		System.out.println("                        set nginx -T dump file directory, input is mandatory");
