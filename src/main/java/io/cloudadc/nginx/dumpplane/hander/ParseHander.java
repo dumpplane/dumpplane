@@ -1,4 +1,4 @@
-package io.github.cloudadc.dumpplane.hander;
+package io.cloudadc.nginx.dumpplane.hander;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import io.github.cloudadc.dumpplane.model.Configuration;
-import io.github.cloudadc.dumpplane.model.Dumpplane;
+import io.cloudadc.nginx.dumpplane.model.Configuration;
+import io.cloudadc.nginx.dumpplane.model.Dumpplane;
 
 
 public class ParseHander extends AbstractHander {

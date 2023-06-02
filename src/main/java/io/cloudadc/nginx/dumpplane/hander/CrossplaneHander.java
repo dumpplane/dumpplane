@@ -1,4 +1,4 @@
-package io.github.cloudadc.dumpplane.hander;
+package io.cloudadc.nginx.dumpplane.hander;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -6,8 +6,8 @@ import java.io.IOException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.github.cloudadc.dumpplane.model.Configuration;
-import io.github.cloudadc.dumpplane.model.Crossplane;
+import io.cloudadc.nginx.dumpplane.model.Configuration;
+import io.cloudadc.nginx.dumpplane.model.Crossplane;
 
 /**
  * 

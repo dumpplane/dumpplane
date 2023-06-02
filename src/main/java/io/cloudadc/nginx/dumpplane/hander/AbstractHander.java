@@ -1,4 +1,4 @@
-package io.github.cloudadc.dumpplane.hander;
+package io.cloudadc.nginx.dumpplane.hander;
 
 import java.io.File;
 import java.util.List;
@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.github.cloudadc.dumpplane.model.Configuration;
+import io.cloudadc.nginx.dumpplane.model.Configuration;
 
 public abstract class AbstractHander implements Hander {
 	

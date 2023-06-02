@@ -1,8 +1,8 @@
-package io.github.cloudadc.dumpplane.hander;
+package io.cloudadc.nginx.dumpplane.hander;
 
 import java.nio.file.Paths;
 
-import io.github.cloudadc.dumpplane.model.Configuration;
+import io.cloudadc.nginx.dumpplane.model.Configuration;
 
 /**
  * Validation the crossplane result and dumpple result

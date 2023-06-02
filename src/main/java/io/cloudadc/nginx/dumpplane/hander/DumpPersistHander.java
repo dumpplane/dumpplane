@@ -1,4 +1,4 @@
-package io.github.cloudadc.dumpplane.hander;
+package io.cloudadc.nginx.dumpplane.hander;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -22,7 +22,7 @@ import com.mongodb.client.result.UpdateResult;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import co.elastic.clients.elasticsearch.core.IndexResponse;
-import io.github.cloudadc.dumpplane.model.Configuration;
+import io.cloudadc.nginx.dumpplane.model.Configuration;
 
 public class DumpPersistHander extends AbstractHander {
 	

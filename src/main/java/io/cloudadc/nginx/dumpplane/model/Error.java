@@ -1,4 +1,4 @@
-package io.github.cloudadc.dumpplane.model;
+package io.cloudadc.nginx.dumpplane.model;
 
 import java.io.Serializable;
 

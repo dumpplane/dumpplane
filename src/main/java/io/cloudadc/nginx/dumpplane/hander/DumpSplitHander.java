@@ -1,4 +1,4 @@
-package io.github.cloudadc.dumpplane.hander;
+package io.cloudadc.nginx.dumpplane.hander;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -8,8 +8,8 @@ import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.List;
 
-import io.github.cloudadc.dumpplane.model.Configuration;
-import io.github.cloudadc.dumpplane.model.Dumpplane;
+import io.cloudadc.nginx.dumpplane.model.Configuration;
+import io.cloudadc.nginx.dumpplane.model.Dumpplane;
 
 public class DumpSplitHander extends AbstractHander {
 
