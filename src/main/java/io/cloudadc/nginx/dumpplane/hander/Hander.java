@@ -8,6 +8,8 @@ public interface Hander {
 	
 	public static final String DISK_PATH = "data";
 	
+	public static final String DUMP_PATH = ".dumpplane";
+	
 	public static final String DB_NAME = "nginx";
 	
 	public void execute() throws Exception;

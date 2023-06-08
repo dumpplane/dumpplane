@@ -26,6 +26,8 @@ import io.cloudadc.nginx.dumpplane.hander.ParseHander;
 import io.cloudadc.nginx.dumpplane.hander.ValidationHander;
 import io.cloudadc.nginx.dumpplane.model.Configuration;
 
+import static io.cloudadc.nginx.dumpplane.hander.Hander.*;
+
 @SpringBootApplication
 public class Main implements CommandLineRunner {
 	
@@ -33,9 +35,9 @@ public class Main implements CommandLineRunner {
 
 	public static void main(String[] args) {
 		
-		//args = new String[] {"dump", "--uri", "http://localhost:9200", "/Users/ksong/src/dumpplane/input"};
+		//args = new String[] {"dump", "input"};
 		
-		//args = new String[] {"parse", "/Users/ksong/Downloads/conf"};
+		//args = new String[] {"parse", "input"};
 
 		SpringApplication.run(Main.class, args);
 	}
@@ -49,7 +51,7 @@ public class Main implements CommandLineRunner {
 		
 		String uri = "file://output";
 		String input = args[args.length - 1];
-		String output = Hander.DISK_PATH;
+		String output = Paths.get(System.getProperty("user.home"), DUMP_PATH, DISK_PATH).toString();
 		String crossplanoutput = output;
 		
 		for(int i = 0 ; i < args.length ; i++) {
@@ -162,8 +164,9 @@ public class Main implements CommandLineRunner {
 		System.out.println("  -V, --version         show program's version number and exit");
 		System.out.println("  --output              set dumpplane output file path, default " + Hander.DISK_PATH);
 		System.out.println("  --cpout               set crossplane(https://github.com/nginxinc/crossplane) parse output file path. default same as dumpplane output");
-		System.out.println("                            suggest crossplane commands is for i in $(ls data/) ; do crossplane parse -o data/$i.json data/$i/nginx.conf; done ");
+		System.out.println("                            suggest crossplane commands is for i in $(ls ~/.dumpplane/data/) ; do crossplane parse -o ~/.dumpplane/data/$i.json ~/.dumpplane/data/$i/nginx.conf; done ");
 		System.out.println("  --uri                 dump string, default file://output, output is the final output dolder" );
+		System.out.println("                                     http://localhost:9200, refer to https://www.elastic.co/guide/en/elasticsearch/client/java-api-client/7.17/connecting.html for details" );
 		System.out.println("                                     mongodb://127.0.0.1:27017, refer to https://www.mongodb.com/docs/manual/reference/connection-string/ for details" );
 		System.out.println();
 		System.out.println("input:");

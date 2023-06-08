@@ -18,17 +18,20 @@ public class Block implements Serializable {
 	
 	private List<Integer> includes = new ArrayList<>();
 	
+	private String comment;
+	
 	public Block() {
 		
 	}
 
-	public Block(Integer line, List<String> args, List<Block> block, String directive, List<Integer> includes) {
+	public Block(Integer line, List<String> args, List<Block> block, String directive, List<Integer> includes,String comment) {
 		super();
 		this.line = line;
 		this.args = args;
 		this.block = block;
 		this.directive = directive;
 		this.includes = includes;
+		this.comment = comment;
 	}
 
 	public Integer getLine() {
@@ -69,6 +72,14 @@ public class Block implements Serializable {
 
 	public void setIncludes(List<Integer> includes) {
 		this.includes = includes;
+	}
+
+	public String getComment() {
+		return comment;
+	}
+
+	public void setComment(String comment) {
+		this.comment = comment;
 	}
 
 	@Override

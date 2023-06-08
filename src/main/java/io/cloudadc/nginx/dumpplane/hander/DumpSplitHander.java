@@ -39,9 +39,9 @@ public class DumpSplitHander extends AbstractHander {
 			Path filePath = null;
 			
 			if(subPath != null) {
-				filePath = Paths.get(DISK_PATH, config.getDumpFileName(), subPath, fileName);
+				filePath = Paths.get(System.getProperty("user.home"), DUMP_PATH, DISK_PATH, config.getDumpFileName(), subPath, fileName);
 			} else {
-				filePath = Paths.get(DISK_PATH, config.getDumpFileName(), fileName);
+				filePath = Paths.get(System.getProperty("user.home"), DUMP_PATH, DISK_PATH, config.getDumpFileName(), fileName);
 			}
 
 			File directory = filePath.getParent().toFile();
@@ -56,7 +56,7 @@ public class DumpSplitHander extends AbstractHander {
 			writer.close();
 		}
 		
-		System.out.println("split " + config.getDumpFileName() + " to " + Paths.get(config.getDiskPath(), config.getDumpFileName()) + ", total blocks: " + config.dumpplane().size());
+		System.out.println("split " + config.getDumpFileName() + " to " + config.getDumpFileName() + ", total blocks: " + config.dumpplane().size());
 		
 	}
 
