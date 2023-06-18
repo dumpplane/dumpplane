@@ -1,5 +1,9 @@
 
-__all__ = ['split', 'parse', 'dump']
+from .split import split
+from .dump import dump
+
+__all__ = ['split', 'dump']
+
 __title__ = 'dumpplane'
 __summary__ = 'Management and Governance NGINX with a Modern Analysis Way'
 __url__ = 'https://github.com/kylinsoong/dumpplane'

@@ -1,12 +1,16 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 
-from crossplane import parse
-
+import sys
+import exec
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
+from traceback import format_exception
 
-#from . import __version__
+def split(filename, out):
+    print(filename, out)
 
-__version__ = '0.1'
+def dump(filename, input, out):
+    print(filename, input, out)
+
 
 class _SubparserHelpFormatter(RawDescriptionHelpFormatter):
     def _format_action(self, action):
@@ -27,28 +31,25 @@ def parse_args(args=None):
         description='various operations for nginx config files',
         usage='%(prog)s <command> [options]'
     )
-    parser.add_argument('-V', '--version', action='version', version='%(prog)s ' + __version__)
+    parser.add_argument('-V', '--version', action='version', version='%(prog)s ' + exec.__version__)
     subparsers = parser.add_subparsers(title='commands')
 
     def create_subparser(function, help):
         name = function.__name__
-        prog = 'crossplane ' + name
+        prog = 'dumpplane ' + name
         p = subparsers.add_parser(name, prog=prog, help=help, description=help)
         p.set_defaults(_subcommand=function)
         return p
 
-    p = create_subparser(parse, 'parses a json payload for an nginx config')
-    p.add_argument('filename', help='the nginx config file')
-    p.add_argument('-o', '--out', type=str, help='write output to a file')
-    p.add_argument('-i', '--indent', type=int, metavar='NUM', help='number of spaces to indent output')
-    p.add_argument('--ignore', metavar='DIRECTIVES', default='', help='ignore directives (comma-separated)')
-    p.add_argument('--no-catch', action='store_false', dest='catch', help='only collect first error in file')
-    p.add_argument('--tb-onerror', action='store_true', help='include tracebacks in config errors')
-    p.add_argument('--combine', action='store_true', help='use includes to create one single file')
-    p.add_argument('--single-file', action='store_true', dest='single', help='do not include other config files')
-    p.add_argument('--include-comments', action='store_true', dest='comments', help='include comments in json')
-    p.add_argument('--strict', action='store_true', help='raise errors for unknown directives')
+    p = create_subparser(split, 'split a nginx dump(nginx -T) .conf to raw files')
+    p.add_argument('filename', help='the nginx dump(nginx -T) folder')
+    p.add_argument('-o', '--out', type=str, help='write output to a folder, default ~/.dumpplane/data')
 
+    p = create_subparser(dump, 'dump crossplane parsed .json to data storage')
+    p.add_argument('filename', help='the nginx dump(nginx -T) folder')
+    p.add_argument('-i', '--input', type=str, help='read input from folder which contains crossplane parsed json, default ~/.dumpplane/data')
+    p.add_argument('-o', '--out', type=str, help='dump crossplane parsed .json to data storage, supported output: [mongodb://127.0.0.1:27017, http://localhost:9200, file://output], default file://output')
+    
     def help(command):
         if command not in parser._actions[-1].choices:
             parser.error('unknown command %r' % command)
@@ -60,21 +61,15 @@ def parse_args(args=None):
 
     parsed = parser.parse_args(args=args)
 
-    print(parsed.__dict__)
-
-    # this addresses a bug that was added to argparse in Python 3.3
     if not parsed.__dict__:
         parser.error('too few arguments')
 
     return parsed
 
-
-
 def main():
     kwargs = parse_args().__dict__
     func = kwargs.pop('_subcommand')
     func(**kwargs)
-
 
 if __name__ == '__main__':
     main()
