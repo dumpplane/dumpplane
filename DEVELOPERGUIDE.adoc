@@ -1,0 +1,20 @@
+= Developer Guide
+
+== Run dumpplane code
+
+[source, bash]
+----
+$ python3 dumpplane -h
+usage: dumpplane <command> [options]
+
+various operations for nginx config files
+
+optional arguments:
+  -h, --help         show this help message and exit
+  -V, --version      show program's version number and exit
+
+commands:
+  split              split a nginx dump(nginx -T) .conf to raw files
+  dump               dump crossplane parsed .json to data storage
+  help               show help for commands
+----

@@ -1,3 +1,3 @@
 
-def dump():
-    print("YEs")
+def dump(conf, input, out):
+    print(conf, input, out)

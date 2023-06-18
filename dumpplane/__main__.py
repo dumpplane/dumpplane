@@ -1,15 +1,35 @@
 #!/usr/bin/python3
 
 import sys
+import os
 import exec
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from traceback import format_exception
 
+def create_folders(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+def get_dumpplane_data_folder_path():
+    home_directory = os.path.expanduser( '~' )
+    out = os.path.join( home_directory, '.dumpplane', 'data' )
+    return out
+
 def split(filename, out):
-    print(filename, out)
+    if out is None:
+        out = get_dumpplane_data_folder_path()
+    create_folders(out)
+    exec.split(filename, out)
 
 def dump(filename, input, out):
-    print(filename, input, out)
+    if input is None:
+        input = get_dumpplane_data_folder_path()
+    if out is None:
+        current_directory = os.path.dirname(os.path.abspath(sys.argv[0]))
+        out = os.path.join( current_directory, 'output' )
+    create_folders(input)
+    create_folders(out)
+    exec.dump(filename, input, out)
 
 
 class _SubparserHelpFormatter(RawDescriptionHelpFormatter):
