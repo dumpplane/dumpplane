@@ -30,7 +30,6 @@ options:
 
 input:
                         set nginx -T dump file directory, input is mandatory
-
 ----
 
 == Prerequisites for run dumpplane
