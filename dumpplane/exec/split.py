@@ -18,9 +18,13 @@ def split_file(file, out):
     with open(file, 'r') as fo:
         data_all = fo.read()
 
+    subfiles = re.findall(r'# configuration file\s+\S+:',data_all, re.I)
+    for item,num  in zip(subfiles,range(len(subfiles))):
+        print(item, type(item), num)
+
     config['basePath'] = '/etc/nginx'
 
-    print(data_all)
+    #print(subfiles)
 
 def split(conf, out):
     for filename in os.listdir(conf):

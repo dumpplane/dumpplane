@@ -5,7 +5,7 @@ image:ext/dumpplane-logo.png[Dumpplane logo]
 
 == What's dumpplane?
 
-The `dumpplane` is a tool work with link:https://github.com/nginxinc/crossplane[crossplane] to dump `nginx -T` results to MongoDB, which enables Ops Management and Governance NGINX with a modern Big No-SQL Data Analysis Way.
+The `dumpplane` is a tool work with link:https://github.com/nginxinc/crossplane[crossplane] to model and dump nginx configuration to Real Time Data Store(MongoDB, ElasticSearch, BigTable), which enables Ops Manage and Govern NGINX with a Modern No-SQL Data Analysis/Modern Observability/Modern AIOps Way.
 
 image:ext/dumpplane-pipeline.png[]
 
