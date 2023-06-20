@@ -46,9 +46,6 @@ def split_file(file, out):
             conf_data_start = re.search(item, data_all, re.I).start()
             conf_data_detail = data_all[conf_data_start:]
 
-        if "/etc/nginx/mime.types" in conf_data_detail:
-            conf_data_detail = conf_data_detail.replace("/etc/nginx/mime.types", "mime.types")
-
         conf_path_details = extractFilepathName(item)
 
         if basePath is None:
@@ -76,7 +73,12 @@ def dump_to_disk():
                 os.makedirs(out_dir)
             file_to_write = os.path.join( out_dir, d['filename'] )
             f = open(file_to_write, "w")
-            f.write(d['content'])
+            content = d['content']
+
+            if basePath in content:
+                content = content.replace(basePath + "/", "") 
+
+            f.write(content)
 
 
 
