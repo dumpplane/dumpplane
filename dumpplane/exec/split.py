@@ -38,13 +38,14 @@ def split_file(file, out):
         conf_list.append(item)
 
     for item, num in zip(subfiles,range(len(subfiles))):
+        length = len(item)
         if num < len(conf_list) - 1:
             conf_data_start = re.search(item, data_all, re.I).start()
             conf_data_end = re.search(conf_list[num + 1], data_all[conf_data_start:]).start()
-            conf_data_detail = data_all[conf_data_start:][:conf_data_end]  
+            conf_data_detail = data_all[conf_data_start + length:][:conf_data_end - length]  
         else:
             conf_data_start = re.search(item, data_all, re.I).start()
-            conf_data_detail = data_all[conf_data_start:]
+            conf_data_detail = data_all[conf_data_start + length:]
 
         conf_path_details = extractFilepathName(item)
 
@@ -53,7 +54,7 @@ def split_file(file, out):
         elif conf_path_details[1] in basePath:
             basePath = conf_path_details[1]
 
-        dumpplane.append({'filepath': conf_path_details[0], 'dirname': conf_path_details[1], 'filename': conf_path_details[2], 'content': conf_data_detail})
+        dumpplane.append({'filepath': conf_path_details[0], 'dirname': conf_path_details[1], 'filename': conf_path_details[2], 'separator': item, 'content': conf_data_detail})
 
     config['basePath'] = basePath
     config['dumpplane'] = dumpplane
@@ -74,10 +75,9 @@ def dump_to_disk():
             file_to_write = os.path.join( out_dir, d['filename'] )
             f = open(file_to_write, "w")
             content = d['content']
-
             if basePath in content:
                 content = content.replace(basePath + "/", "") 
-
+            content = content.replace(d['separator'], "")
             f.write(content)
 
 

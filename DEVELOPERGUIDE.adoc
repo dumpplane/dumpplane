@@ -18,3 +18,11 @@ commands:
   dump               dump crossplane parsed .json to data storage
   help               show help for commands
 ----
+
+== Run pipeline
+
+[source, bash]
+----
+python3 dumpplane split input 
+for i in $(ls ~/.dumpplane/data/) ; do crossplane parse -o ~/.dumpplane/data/$i.json ~/.dumpplane/data/$i/nginx.conf ; done 
+----
