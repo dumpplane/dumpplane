@@ -19,7 +19,7 @@ def split(filename, out):
     if out is None:
         out = get_dumpplane_data_folder_path()
     create_folders(out)
-    exec.split(filename, out)
+    exec.split(filename, out, True)
 
 def dump(filename, input, out):
     if input is None:

@@ -61,14 +61,36 @@ def split_file(file, out):
     config['basePath'] = basePath
     config['dumpplane'] = dumpplane
 
-    for i in config['dumpplane']:
-        print(i['content'])
+    lists.append(config)
 
 
-def split(conf, out):
+def dump_to_disk():
+    for c in lists:
+        basePath = c['basePath']
+        dumpplane = c['dumpplane']
+        diskPath = c['diskPath']
+        for d in dumpplane:
+            prefix = d['dirname'][len(basePath):]
+            out_dir = diskPath + prefix
+            if not os.path.exists(out_dir):
+                os.makedirs(out_dir)
+            file_to_write = os.path.join( out_dir, d['filename'] )
+            f = open(file_to_write, "w")
+            f.write(d['content'])
+
+
+
+def spliti_files(conf, out):
     for filename in os.listdir(conf):
         f = os.path.join(conf, filename)
         if os.path.isfile(f):
             split_file(f, out)
         else:
-            split(f, out)
+            spliti_files(f, out)
+
+
+def split(conf, out, dump):
+    spliti_files(conf, out)
+    if dump:
+        dump_to_disk()
+    return lists
