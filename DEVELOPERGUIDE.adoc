@@ -23,7 +23,8 @@ commands:
 
 [source, bash]
 ----
-python3 dumpplane split input 
+python3 dumpplane split ext/conf
 for i in $(ls ~/.dumpplane/data/) ; do crossplane parse -o ~/.dumpplane/data/$i.json ~/.dumpplane/data/$i/nginx.conf ; done 
-python3 dumpplane dump input
+python3 dumpplane dump ext/conf 
+python3 dumpplane dump ext/conf -o mongodb://127.0.0.1:27017 
 ----

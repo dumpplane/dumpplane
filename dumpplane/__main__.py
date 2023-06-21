@@ -21,15 +21,19 @@ def split(filename, out):
     create_folders(out)
     exec.split(filename, out, True)
 
-def dump(filename, input, out):
+def dump(filename, input, out, db, table):
     if input is None:
         input = get_dumpplane_data_folder_path()
     if out is None:
         current_directory = os.path.dirname(os.path.abspath(sys.argv[0]))
         out = os.path.join( current_directory, 'output' )
+    if db is None:
+        db = "nginx"
+    if table is None:
+        table = "configurations"
     create_folders(input)
     create_folders(out)
-    exec.dump(filename, input, out)
+    exec.dump(filename, input, out, db, table)
 
 
 class _SubparserHelpFormatter(RawDescriptionHelpFormatter):
@@ -68,7 +72,9 @@ def parse_args(args=None):
     p = create_subparser(dump, 'dump crossplane parsed .json to data storage')
     p.add_argument('filename', help='the nginx dump(nginx -T) folder')
     p.add_argument('-i', '--input', type=str, help='read input from folder which contains crossplane parsed json, default ~/.dumpplane/data')
-    p.add_argument('-o', '--out', type=str, help='dump crossplane parsed .json to data storage, supported output: [mongodb://127.0.0.1:27017, http://localhost:9200, file://output], default file://output')
+    p.add_argument('-o', '--out', type=str, help='dump crossplane parsed .json to data storage, supported output: [mongodb://127.0.0.1:27017, http://localhost:9200, file://output], default output from current path')
+    p.add_argument('--db', type=str, help='db used to hold configurations, default nginx')
+    p.add_argument('--table', type=str, help='table used to hold configurations, default configurations')
     
     def help(command):
         if command not in parser._actions[-1].choices:
