@@ -32,7 +32,8 @@ def split_file(file, out):
     subfiles = re.findall(r'# configuration file\s+\S+:',data_all, re.I)
     basePath = None
     conf_list = []
-    dumpplane = []
+    dumpplane = {}
+    rawconfig = []
 
     for item in subfiles:
         conf_list.append(item)
@@ -54,9 +55,11 @@ def split_file(file, out):
         elif conf_path_details[1] in basePath:
             basePath = conf_path_details[1]
 
-        dumpplane.append({'filepath': conf_path_details[0], 'dirname': conf_path_details[1], 'filename': conf_path_details[2], 'separator': item, 'content': conf_data_detail})
+        rawconfig.append({'filepath': conf_path_details[0], 'dirname': conf_path_details[1], 'filename': conf_path_details[2], 'separator': item, 'content': conf_data_detail})
 
     config['basePath'] = basePath
+    dumpplane['conf_num'] = len(rawconfig)
+    dumpplane['rawconfig'] = rawconfig
     config['dumpplane'] = dumpplane
 
     lists.append(config)
@@ -67,7 +70,7 @@ def dump_to_disk():
         basePath = c['basePath']
         dumpplane = c['dumpplane']
         diskPath = c['diskPath']
-        for d in dumpplane:
+        for d in dumpplane['rawconfig']:
             prefix = d['dirname'][len(basePath):]
             out_dir = diskPath + prefix
             if not os.path.exists(out_dir):

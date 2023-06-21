@@ -1,0 +1,1306 @@
+# configuration file /etc/nginx/nginx.conf:
+
+user  nginx;
+worker_processes  auto;
+
+error_log  /var/log/nginx/error.log notice;
+pid        /var/run/nginx.pid;
+
+load_module modules/ngx_http_app_protect_module.so;
+load_module modules/ngx_http_js_module.so;
+
+events {
+    worker_connections  1024;
+}
+
+
+http {
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+
+    access_log  /var/log/nginx/access.log  main;
+
+    app_protect_security_log_enable on;
+    app_protect_security_log "/etc/app_protect/conf/log_default.json" /var/log/app_protect/security.log;
+
+
+    sendfile        on;
+    #tcp_nopush     on;
+
+    keepalive_timeout  65;
+
+    #gzip  on;
+
+    include /etc/nginx/conf.d/*.conf;
+    include /etc/nginx/ap.d/*.conf;
+    include /etc/nginx/gw-server.d/*.conf;
+    include /etc/nginx/gw-type.d/*.conf;
+    include /etc/nginx/gw-health.d/*.conf;
+    include /etc/nginx/gw-persist.d/*.conf;
+    include /etc/nginx/gw-methods.d/*.conf;
+    include /etc/nginx/gw-preserve.d/*.conf;
+}
+
+
+# TCP/UDP proxy and load balancing block
+#
+stream {
+    include /etc/nginx/gw-type.d/stream/*.conf;
+    include /etc/nginx/gw-health.d/stream/*.conf;
+    # Example configuration for TCP load balancing
+
+    #upstream stream_backend {
+    #    zone tcp_servers 64k;
+    #    server backend1.example.com:12345;
+    #    server backend2.example.com:12345;
+    #}
+
+    #server {
+    #    listen 12345;
+    #    status_zone tcp_server;
+    #    proxy_pass stream_backend;
+    #}
+}
+
+# configuration file /etc/nginx/mime.types:
+
+types {
+    text/html                                        html htm shtml;
+    text/css                                         css;
+    text/xml                                         xml;
+    image/gif                                        gif;
+    image/jpeg                                       jpeg jpg;
+    application/javascript                           js;
+    application/atom+xml                             atom;
+    application/rss+xml                              rss;
+
+    text/mathml                                      mml;
+    text/plain                                       txt;
+    text/vnd.sun.j2me.app-descriptor                 jad;
+    text/vnd.wap.wml                                 wml;
+    text/x-component                                 htc;
+
+    image/avif                                       avif;
+    image/png                                        png;
+    image/svg+xml                                    svg svgz;
+    image/tiff                                       tif tiff;
+    image/vnd.wap.wbmp                               wbmp;
+    image/webp                                       webp;
+    image/x-icon                                     ico;
+    image/x-jng                                      jng;
+    image/x-ms-bmp                                   bmp;
+
+    font/woff                                        woff;
+    font/woff2                                       woff2;
+
+    application/java-archive                         jar war ear;
+    application/json                                 json;
+    application/mac-binhex40                         hqx;
+    application/msword                               doc;
+    application/pdf                                  pdf;
+    application/postscript                           ps eps ai;
+    application/rtf                                  rtf;
+    application/vnd.apple.mpegurl                    m3u8;
+    application/vnd.google-earth.kml+xml             kml;
+    application/vnd.google-earth.kmz                 kmz;
+    application/vnd.ms-excel                         xls;
+    application/vnd.ms-fontobject                    eot;
+    application/vnd.ms-powerpoint                    ppt;
+    application/vnd.oasis.opendocument.graphics      odg;
+    application/vnd.oasis.opendocument.presentation  odp;
+    application/vnd.oasis.opendocument.spreadsheet   ods;
+    application/vnd.oasis.opendocument.text          odt;
+    application/vnd.openxmlformats-officedocument.presentationml.presentation
+                                                     pptx;
+    application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+                                                     xlsx;
+    application/vnd.openxmlformats-officedocument.wordprocessingml.document
+                                                     docx;
+    application/vnd.wap.wmlc                         wmlc;
+    application/wasm                                 wasm;
+    application/x-7z-compressed                      7z;
+    application/x-cocoa                              cco;
+    application/x-java-archive-diff                  jardiff;
+    application/x-java-jnlp-file                     jnlp;
+    application/x-makeself                           run;
+    application/x-perl                               pl pm;
+    application/x-pilot                              prc pdb;
+    application/x-rar-compressed                     rar;
+    application/x-redhat-package-manager             rpm;
+    application/x-sea                                sea;
+    application/x-shockwave-flash                    swf;
+    application/x-stuffit                            sit;
+    application/x-tcl                                tcl tk;
+    application/x-x509-ca-cert                       der pem crt;
+    application/x-xpinstall                          xpi;
+    application/xhtml+xml                            xhtml;
+    application/xspf+xml                             xspf;
+    application/zip                                  zip;
+
+    application/octet-stream                         bin exe dll;
+    application/octet-stream                         deb;
+    application/octet-stream                         dmg;
+    application/octet-stream                         iso img;
+    application/octet-stream                         msi msp msm;
+
+    audio/midi                                       mid midi kar;
+    audio/mpeg                                       mp3;
+    audio/ogg                                        ogg;
+    audio/x-m4a                                      m4a;
+    audio/x-realaudio                                ra;
+
+    video/3gpp                                       3gpp 3gp;
+    video/mp2t                                       ts;
+    video/mp4                                        mp4;
+    video/mpeg                                       mpeg mpg;
+    video/quicktime                                  mov;
+    video/webm                                       webm;
+    video/x-flv                                      flv;
+    video/x-m4v                                      m4v;
+    video/x-mng                                      mng;
+    video/x-ms-asf                                   asx asf;
+    video/x-ms-wmv                                   wmv;
+    video/x-msvideo                                  avi;
+}
+
+# configuration file /etc/nginx/conf.d/app.conf:
+server {
+    listen    7101;
+    server_name _;
+
+    status_zone status_app;
+
+    location /foo {
+        status_zone status_app_foo;
+#        app_protect_enable on;
+#        app_protect_policy_file "/etc/app_protect/conf/NginxDefaultPolicy.json";
+        proxy_pass http://backend;
+    }
+
+}
+
+# configuration file /etc/nginx/conf.d/backend.conf:
+upstream backend {
+    zone   backend 64k;
+    server 10.1.10.171:8080;
+    server 10.1.10.172:8080;
+}
+
+upstream backendapi {
+    zone   backendapi 64k;
+    server 10.1.10.171:8090;
+    server 10.1.10.172:8090;
+}
+
+upstream backendgRPC {
+  zone backendgRPC 64k;
+  server 10.1.10.171:8009;
+  server 10.1.10.172:8009;
+}
+
+
+
+# configuration file /etc/nginx/conf.d/default.conf:
+server {
+    listen       8080 default_server;
+    server_name  localhost;
+
+    #access_log  /var/log/nginx/host.access.log  main;
+
+    location / {
+        root   /usr/share/nginx/html;
+        index  index.html index.htm;
+    }
+
+    location /api {
+        api write=on;
+        access_log  off;
+    }
+
+    location = /dashboard.html {
+        root   /usr/share/nginx/html;
+        access_log  off;
+    }
+
+    #error_page  404              /404.html;
+
+    # redirect server error pages to the static page /50x.html
+    #
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root   /usr/share/nginx/html;
+    }
+
+    # proxy the PHP scripts to Apache listening on 127.0.0.1:80
+    #
+    #location ~ \.php$ {
+    #    proxy_pass   http://127.0.0.1;
+    #}
+
+    # pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
+    #
+    #location ~ \.php$ {
+    #    root           html;
+    #    fastcgi_pass   127.0.0.1:9000;
+    #    fastcgi_index  index.php;
+    #    fastcgi_param  SCRIPT_FILENAME  /scripts$fastcgi_script_name;
+    #    include        fastcgi_params;
+    #}
+
+    # deny access to .htaccess files, if Apache's document root
+    # concurs with nginx's one
+    #
+    #location ~ /\.ht {
+    #    deny  all;
+    #}
+
+    # enable /api/ location with appropriate access control in order
+    # to make use of NGINX Plus API
+    #
+    #location /api/ {
+    #    api write=on;
+    #    allow 127.0.0.1;
+    #    deny all;
+    #}
+
+    # enable NGINX Plus Dashboard; requires /api/ location to be
+    # enabled and appropriate access control for remote access
+    #
+    #location = /dashboard.html {
+    #    root /usr/share/nginx/html;
+    #}
+}
+
+# configuration file /etc/nginx/ap.d/app-protect-application-admin-access.conf:
+app_protect_user_defined_signatures "/etc/app_protect/conf/uds-application-admin-access.json";
+
+server {
+    listen    8116;
+
+    status_zone status_app-protect-appadminaccess;
+
+    location /foo {
+        status_zone status_app-protect-appadminaccess_foo;
+        app_protect_enable on;
+        app_protect_policy_file "/etc/app_protect/conf/uds-application-admin-access-policy.json";
+        proxy_pass http://backend;
+    }
+
+}
+
+# configuration file /etc/nginx/ap.d/app-protect-filter-content.conf:
+app_protect_user_defined_signatures "/etc/app_protect/conf/uds-filter-content.json";
+
+server {
+    listen    8108;
+    server_name _;
+
+    status_zone status_app-protect-filterContent;
+
+    location /foo {
+        status_zone status_app-protect-filterContent_foo;
+        app_protect_enable on;
+        app_protect_policy_file "/etc/app_protect/conf/uds-filter-content-policy.json";
+        proxy_pass http://backend;
+    }
+
+}
+
+# configuration file /etc/nginx/ap.d/app-protect-host-validation.conf:
+app_protect_user_defined_signatures "/etc/app_protect/conf/uds-host-validation.json";
+
+server {
+    listen    8111;
+
+    status_zone status_app-protect-hostvalidation;
+
+    location /foo {
+        status_zone status_app-protect-hostvalidation_foo;
+        app_protect_enable on;
+        app_protect_policy_file "/etc/app_protect/conf/uds-host-validation-policy.json";
+        proxy_pass http://backend;
+    }
+
+}
+
+# configuration file /etc/nginx/ap.d/app-protect-illegal-directory-access.conf:
+app_protect_user_defined_signatures "/etc/app_protect/conf/uds-illegal-directory-access.json";
+
+server {
+    listen    8112;
+
+    status_zone status_app-protect-illegaldirectory;
+
+    location /foo {
+        status_zone status_app-protect-illegaldirectory_foo;
+        app_protect_enable on;
+        app_protect_policy_file "/etc/app_protect/conf/uds-illegal-directory-access-policy.json";
+        proxy_pass http://backend;
+    }
+
+}
+
+# configuration file /etc/nginx/ap.d/app-protect-illegal-file-extension.conf:
+app_protect_user_defined_signatures "/etc/app_protect/conf/uds-illegal-file-extension.json";
+
+server {
+    listen    8114;
+
+    status_zone status_app-protect-illegalfileextension;
+
+    location /foo {
+        status_zone status_app-protect-illegalfileextension_foo;
+        app_protect_enable on;
+        app_protect_policy_file "/etc/app_protect/conf/uds-illegal-file-extension-policy.json";
+        proxy_pass http://backend;
+    }
+
+}
+
+# configuration file /etc/nginx/ap.d/app-protect-illegal-file-type.conf:
+app_protect_user_defined_signatures "/etc/app_protect/conf/uds-illegal-file-type.json";
+
+server {
+    listen    8115;
+
+    status_zone status_app-protect-illegalfiletype;
+
+    location /foo {
+        status_zone status_app-protect-illegalfiletype_foo;
+        app_protect_enable on;
+        app_protect_policy_file "/etc/app_protect/conf/uds-illegal-file-type-policy.json";
+        proxy_pass http://backend;
+    }
+
+}
+
+# configuration file /etc/nginx/ap.d/app-protect-illegal-request-method.conf:
+app_protect_user_defined_signatures "/etc/app_protect/conf/uds-illegal-request-method.json";
+
+server {
+    listen    8109;
+    server_name _;
+
+    status_zone status_app-protect-illegalRequestMethod;
+
+    location /foo {
+        status_zone status_app-protect-illegalRequestMethod_foo;
+        app_protect_enable on;
+        app_protect_policy_file "/etc/app_protect/conf/uds-illegal-request-method-policy.json";
+        proxy_pass http://backend;
+    }
+
+}
+
+# configuration file /etc/nginx/ap.d/app-protect-week-passwd.conf:
+app_protect_user_defined_signatures "/etc/app_protect/conf/uds-week-passwd.json";
+
+server {
+    listen    8113;
+
+    status_zone status_app-protect-weekpasswd;
+
+    location /foo {
+        status_zone status_app-protect-weekpasswd_foo;
+        app_protect_enable on;
+        app_protect_policy_file "/etc/app_protect/conf/uds-week-passwd-policy.json";
+        proxy_pass http://backend;
+    }
+
+}
+
+# configuration file /etc/nginx/ap.d/app-protect-xff-injection.conf:
+app_protect_user_defined_signatures "/etc/app_protect/conf/uds-xff-injection.json";
+
+server {
+    listen    8110;
+    server_name _;
+
+    status_zone status_app-protect-xffinjection;
+
+    location /foo {
+        status_zone status_app-protect-xffinjection_foo;
+        app_protect_enable on;
+        app_protect_policy_file "/etc/app_protect/conf/uds-xff-injection-policy.json";
+        proxy_pass http://backend;
+    }
+
+}
+
+# configuration file /etc/nginx/ap.d/app.conf:
+server {
+    listen    8101;
+    server_name ap.example.com;
+
+    status_zone status_app;
+
+    location /foo {
+        status_zone status_app_foo;
+        app_protect_enable on;
+        proxy_pass http://backend;
+    }
+
+    location /bar {
+        status_zone status_app_bar;
+        proxy_pass http://backend;
+    }
+}
+
+# configuration file /etc/nginx/ap.d/basic-function-allow-methods.conf:
+server {
+    listen    8004;
+    server_name ap.example.com;
+
+    status_zone status_basic-function-allow-methods;
+
+    location /foo {
+        status_zone status_basic-function-allow-methods_foo;
+        app_protect_enable on;
+        app_protect_policy_file "/etc/app_protect/conf/allow-methods.json";
+        proxy_pass http://backend;
+    }
+}
+
+# configuration file /etc/nginx/ap.d/basic-function-custompage.conf:
+server {
+    listen    8007;
+    server_name ap.example.com;
+
+    status_zone status_basic-function-custompage;
+
+    location /foo {
+        status_zone status_basic-function-custompage_foo;
+        app_protect_enable on;
+        app_protect_policy_file "/etc/app_protect/conf/custompage.json" ; 
+        proxy_pass http://backend;
+    }
+}
+
+# configuration file /etc/nginx/ap.d/basic-function-data-guard.conf:
+server {
+    listen    8005;
+    server_name ap.example.com;
+
+    status_zone status_basic-function-data-guard;
+
+    location /foo {
+        status_zone status_basic-function-data-guard_foo;
+        app_protect_enable on;
+        app_protect_policy_file "/etc/app_protect/conf/data-guard.json";
+        proxy_pass http://backend;
+    }
+}
+
+# configuration file /etc/nginx/ap.d/basic-function-filetypes.conf:
+server {
+    listen    8006;
+    server_name ap.example.com;
+
+    status_zone status_basic-function-filetypes;
+
+    location /foo {
+        status_zone status_basic-function-filetypes_foo;
+        app_protect_enable on;
+        app_protect_policy_file "/etc/app_protect/conf/filetype.json" ; 
+        proxy_pass http://backend;
+    }
+}
+
+# configuration file /etc/nginx/ap.d/basic-function-http-protocols.conf:
+server {
+    listen    8003;
+    server_name ap.example.com;
+
+    status_zone status_basic-function-http-protocols;
+
+    location /foo {
+        status_zone status_basic-function-http-protocols_foo;
+        app_protect_enable on;
+        app_protect_policy_file "/etc/app_protect/conf/http-protocols.json";
+        proxy_pass http://backend;
+    }
+}
+
+# configuration file /etc/nginx/ap.d/basic-function-transparent.conf:
+server {
+    listen    8001;
+    server_name ap.example.com;
+
+    status_zone status_basic-function-transparent;
+
+    location /foo {
+        status_zone status_basic-function-transparent_foo;
+        app_protect_enable on;
+        app_protect_policy_file "/etc/app_protect/conf/NginxDefaultPolicyTransparent.json";
+        proxy_pass http://backend;
+    }
+
+}
+
+# configuration file /etc/nginx/ap.d/basic-function-whitelist-ips.conf:
+server {
+    listen    8002;
+    server_name ap.example.com;
+
+    status_zone status_basic-function-whitelist-ips;
+
+    location /foo {
+        status_zone status_basic-function-whitelist-ips_foo;
+        app_protect_enable on;
+        app_protect_policy_file "/etc/app_protect/conf/whitelist-ips.json";
+        proxy_pass http://backend;
+    }
+
+}
+
+# configuration file /etc/nginx/ap.d/doc.conf:
+server {
+    listen       8180 default_server;
+    server_name  localhost;
+
+    location / {
+        root   /usr/share/nginx/html/content;
+        index  index.html index.htm;
+    }
+
+}
+
+# configuration file /etc/nginx/ap.d/greeting.conf:
+server {
+    listen 8401 http2;
+    status_zone status_grpcgreeting;
+
+    location / {
+       status_zone status_grpcgreeting;
+       app_protect_enable on;
+       app_protect_policy_file "/etc/app_protect/conf/grpc-greeting.json";
+       grpc_pass grpc://backendgRPC;
+    }
+}
+
+# configuration file /etc/nginx/ap.d/jwt-dual-factor-authentication.conf:
+js_import main from jwt.js;
+js_set $jwt_claim_uid main.jwt_payload_uid;
+
+server {
+  listen 8107;
+  status_zone status_jwt_dual-factor-authentication;
+  location / {
+    status_zone status_jwt_dual-factor-authentication_location;
+
+    if ($jwt_claim_uid != $arg_uid) {
+        return 401 "uid not align with security token governance uid";
+    } 
+
+    proxy_pass http://backend;
+  }
+}
+
+# configuration file /etc/nginx/ap.d/jwt-rate-limit.conf:
+log_format jwt '$remote_addr - $remote_user [$time_local] "$request" '
+               '$status $body_bytes_sent "$http_referer" "$http_user_agent" '
+               '$jwt_claim_tier $jwt_header_alg $jwt_claim_sub $jwt_payload';
+
+limit_req_zone $binary_remote_addr$jwt_claim_tier$jwt_claim_sub zone=standard_zone:10m rate=1r/s;
+limit_req_zone $binary_remote_addr$jwt_claim_tier$jwt_claim_sub zone=premium_zone:10m rate=1000r/s;
+
+map $jwt_claim_tier $rewrite_path_url {
+    standard "/standard";
+    premium  "/premium";
+    default  "/all";
+}
+
+server {
+  listen 8105;
+  status_zone status_jwt-rate-limit;
+
+  location /foo {
+    
+    access_log /var/log/nginx/access_jwt.log jwt;
+
+    status_zone status_jwt-rate-limit_foo;
+
+    auth_jwt "Fruit API";
+    auth_jwt_key_file api.security.jwk;
+
+    rewrite ^.*$ $rewrite_path_url ;
+  }
+
+  location = /premium {
+
+    access_log /var/log/nginx/access_jwt.log jwt;
+
+    limit_req zone=premium_zone burst=5 nodelay;
+    proxy_pass http://backend;
+  }
+  
+  location = /standard {
+
+    access_log /var/log/nginx/access_jwt.log jwt;
+
+    limit_req zone=standard_zone burst=5 nodelay;
+    proxy_pass http://backend;
+  }
+
+  location = /all {
+    
+    access_log /var/log/nginx/access_jwt.log jwt;
+
+    proxy_pass http://backend;
+  }
+}
+
+# configuration file /etc/nginx/ap.d/jwt-validation.conf:
+server {
+  listen 8106;
+  status_zone status_jwt_validation;
+  location / {
+    status_zone status_jwt_validation;
+    auth_jwt "API Realm";
+    auth_jwt_key_file api.security.jwk;
+    proxy_pass http://backend;
+  }
+}
+
+# configuration file /etc/nginx/ap.d/openapi-policy-fruits.conf:
+server {
+    listen    8301;
+    server_name ap.example.com;
+
+    status_zone status_openapi-policy-fruits;
+
+    location / {
+        status_zone status_openapi-policy-fruits;
+        app_protect_enable on;
+        app_protect_policy_file "/etc/app_protect/conf/NginxApiSecurityPolicy.json";
+        proxy_pass http://backendapi;
+    }
+
+}
+
+# configuration file /etc/nginx/gw-server.d/defaut_server.conf:
+server {
+    listen 9002;
+    server_name "bar.com";
+    
+    location / {
+        default_type text/plain; 
+        return 200 "from 9002 bar.com";
+    }
+}
+
+server {
+    listen 9002;
+    server_name "foo.com";
+
+    location / {
+        default_type text/plain;
+        return 200 "from 9002 foo.com";
+    }
+}
+
+server {
+    listen 9003;
+    server_name "bar.com";
+
+    location / {
+        default_type text/plain;
+        return 200 "from 9003 bar.com";
+    }
+}
+
+server {
+    listen 9003 default_server;
+    server_name "foo.com";
+
+    location / {
+        default_type text/plain;
+        return 200 "from 9003 foo.com";
+    }
+}
+
+# configuration file /etc/nginx/gw-server.d/listen-ipv6.conf:
+server {
+    listen    [fd15:4ba5:5a2b:1003:9d08:1036:986e:b1f9]:9008 ipv6only=on;
+    server_name example.com;
+    
+    location / {
+        default_type text/plain; 
+        return 200 "from $http_host";
+    }
+}
+
+server {
+    listen    9009;
+    listen    [::]:9009;
+    server_name example.com;
+
+    location / {
+        default_type text/plain;
+        return 200 "from $http_host";
+    }
+}
+
+
+# configuration file /etc/nginx/gw-server.d/listen-ssl.conf:
+server {
+    listen              9007 ssl;
+    server_name         example.com;
+    ssl_certificate     gw-server.d/crt/example.com.crt;
+    ssl_certificate_key gw-server.d/crt/example.com.key;
+    ssl_password_file   gw-server.d/crt/example.com.pass;
+    ssl_protocols       TLSv1 TLSv1.1 TLSv1.2;
+    ssl_ciphers         HIGH:!aNULL:!MD5;    
+
+    location / {
+        default_type text/plain; 
+        return 200 " from 9007 ssl";
+    }
+}
+
+
+# configuration file /etc/nginx/gw-server.d/listen.conf:
+server {
+    listen    9001;
+    
+    location / {
+        default_type text/plain; 
+        return 200 "9001";
+    }
+}
+
+server {
+    listen    10.1.10.195:9001;
+    
+    location / {
+        default_type text/plain; 
+        return 200 "10.1.10.195:9001";
+    }
+}
+
+server {
+    listen    10.1.10.195;
+
+    location / {
+        default_type text/plain; 
+        return 200 "10.1.10.195";
+    }
+}
+
+
+# configuration file /etc/nginx/gw-server.d/server_name.conf:
+server {
+    listen    9004;
+    server_name "foo.example.com";
+    
+    location / {
+        default_type text/plain; 
+        return 200 "from foo.example.com";
+    }
+}
+
+server {
+    listen    9004;
+    server_name "bar.example.com";
+
+    location / {
+        default_type text/plain;
+        return 200 "from bar.example.com";
+    }
+}
+
+server {
+    listen    9004;
+    server_name "zoo.example.com";
+
+    location / {
+        default_type text/plain;
+        return 200 "from zoo.example.com";
+    }
+}
+
+# configuration file /etc/nginx/gw-server.d/server_name_empty.conf:
+server {
+    listen    9005;
+    server_name _;
+
+    location / {
+        default_type text/plain;
+        return 200 "from catch-all, $http_host";
+    }
+}
+
+server {
+    listen    9005;
+    server_name  a.example.com  b.example.com  c.example.com  *.example.com;
+
+    location / {
+        default_type text/plain;
+        return 200 "from multi, $http_host";
+    }
+}
+
+# configuration file /etc/nginx/gw-server.d/server_name_regular.conf:
+server {
+    listen    9006;
+    server_name *.example.com;
+
+    location / {
+        default_type text/plain;
+        return 200 "from *.example.com, $http_host";
+    }
+}
+
+server {
+    listen    9006;
+    server_name test.*;
+
+    location / {
+        default_type text/plain;
+        return 200 "from test.*, $http_host";
+    }
+}
+
+server {
+    listen    9006;
+    server_name  ~^(?<user>.+)\.example\.net$;
+
+    location / {
+        default_type text/plain;
+        return 200 "from regular expressions names, $http_host";
+    }
+}
+
+# configuration file /etc/nginx/gw-type.d/grpc.conf:
+server {
+  listen 9041 http2;
+  status_zone server_backendgRPC;
+  location / {
+    status_zone location_backendgRPC;
+    grpc_pass grpc://backendgRPC;
+  }
+}
+
+
+# configuration file /etc/nginx/gw-type.d/http.conf:
+upstream backendHTTP {
+  zone upstream_backendHTTP 64k;
+  server 10.1.20.203:8080;
+  server 10.1.20.204:8080;
+}
+
+server {
+  listen 9040;
+  status_zone server_backendHTTP;
+  location / {
+    status_zone location_backendHTTP;
+    proxy_pass http://backendHTTP;
+  }
+}
+
+
+# configuration file /etc/nginx/gw-health.d/grpc.conf:
+upstream backendgRPC1 {
+  zone upstream_backendgRPC1 64k;
+  server 10.1.20.203:8009;
+  server 10.1.20.204:8009;
+}
+
+server {
+  listen 9054 http2;
+  status_zone server_backendgRPC1;
+  location / {
+    status_zone location_backendgRPC1;
+    health_check type=grpc grpc_status=12;
+    grpc_pass grpc://backendgRPC1;
+  }
+}
+
+
+# configuration file /etc/nginx/gw-health.d/http1.conf:
+upstream backendHTTP1 {
+  zone upstream_backendHTTP1 64k;
+  server 10.1.20.203:8080 max_fails=3 fail_timeout=3s;
+  server 10.1.20.204:8080 max_fails=3 fail_timeout=3s;
+}
+
+server {
+  listen 9051;
+  status_zone server_backendHTTP1;
+  location / {
+    status_zone location_backendHTTP1;
+    proxy_pass http://backendHTTP1;
+  }
+}
+
+
+# configuration file /etc/nginx/gw-health.d/http2.conf:
+upstream backendHTTP2 {
+  zone upstream_backendHTTP2 64k;
+  server 10.1.20.203:8080 ;
+  server 10.1.20.204:8080 ;
+}
+
+server {
+  listen 9052;
+  status_zone server_backendHTTP2;
+  location / {
+    status_zone location_backendHTTP2;
+    health_check interval=10 passes=2 fails=3;
+    proxy_pass http://backendHTTP2;
+  }
+}
+
+
+# configuration file /etc/nginx/gw-health.d/http3.conf:
+upstream backendHTTP3 {
+  zone upstream_backendHTTP3 64k;
+  server 10.1.20.203:8080 ;
+  server 10.1.20.204:8080 ;
+}
+
+match server_ok {
+    status 200-399;
+    body ~ "health";
+}
+
+server {
+  listen 9053;
+  status_zone server_backendHTTP3;
+  location / {
+    status_zone location_backendHTTP3;
+    health_check interval=10 passes=2 fails=3 uri=/health match=server_ok;
+    proxy_pass http://backendHTTP3;
+  }
+}
+
+
+# configuration file /etc/nginx/gw-persist.d/cookie.conf:
+upstream backend_persist_cookie {
+    zone   backend_persist 64k;
+    server 10.1.20.203:8080;
+    server 10.1.20.204:8080;
+    sticky cookie srv_id expires=1h domain=.example.com path=/;
+}
+
+
+server {
+    listen    9016;
+    server_name _;
+
+    status_zone status_persist_cookie;
+
+    location /foo {
+        status_zone status_persist_cookie_foo;
+        proxy_pass http://backend_persist_cookie;
+    }
+
+}
+
+# configuration file /etc/nginx/gw-persist.d/route.conf:
+upstream backend_persist_route {
+    zone   backend_persist 64k;
+    server 10.1.20.203:8080 route=a;
+    server 10.1.20.204:8080 route=b;
+    sticky route $route_cookie $route_uri;
+}
+
+map $cookie_jsessionid $route_cookie {
+    ~.+\.(?P<route>\w+)$ $route;
+}
+
+map $request_uri $route_uri {
+    ~jsessionid=.+\.(?P<route>\w+)$ $route;
+}
+
+
+server {
+    listen    9017;
+    server_name _;
+
+    status_zone status_persist_route;
+
+    location /foo {
+        status_zone status_persist_route_foo;
+        proxy_pass http://backend_persist_route;
+    }
+
+}
+
+# configuration file /etc/nginx/gw-persist.d/source_addr.conf:
+upstream backend_persist_source_addr {
+    zone   backend_persist 64k;
+    ip_hash;
+    server 10.1.20.203:8080;
+    server 10.1.20.204:8080;
+}
+
+
+server {
+    listen    9015;
+    server_name _;
+
+    status_zone status_persist_source_addr;
+
+    location /foo {
+        status_zone status_persist_source_addr_foo;
+        proxy_pass http://backend_persist_source_addr;
+    }
+
+}
+
+# configuration file /etc/nginx/gw-methods.d/hash.conf:
+upstream backend_methods_hash {
+    zone   backend_methods 64k;
+    hash $request_uri consistent;
+    server 10.1.20.203:8080;
+    server 10.1.20.204:8080;
+}
+
+
+server {
+    listen    9024;
+    server_name _;
+
+    status_zone status_methods_hash;
+
+    location /foo {
+        status_zone status_methods_hash_foo;
+        proxy_pass http://backend_methods_hash;
+    }
+}
+
+# configuration file /etc/nginx/gw-methods.d/ip_hash.conf:
+upstream backend_methods_ip_hash {
+    zone   backend_methods 64k;
+    ip_hash;
+    server 10.1.20.203:8080;
+    server 10.1.20.204:8080;
+}
+
+
+server {
+    listen    9023;
+    server_name _;
+
+    status_zone status_methods_ip_hash;
+
+    location /foo {
+        status_zone status_methods_ip_hash_foo;
+        proxy_pass http://backend_methods_ip_hash;
+    }
+}
+
+# configuration file /etc/nginx/gw-methods.d/least_conn.conf:
+upstream backend_methods_least_conn {
+    zone   backend_methods 64k;
+    least_conn;
+    server 10.1.20.203:8080;
+    server 10.1.20.204:8080;
+}
+
+
+server {
+    listen    9022;
+    server_name _;
+
+    status_zone status_methods_least_conn;
+
+    location /foo {
+        status_zone status_methods_least_conn_foo;
+        proxy_pass http://backend_methods_least_conn;
+    }
+}
+
+# configuration file /etc/nginx/gw-methods.d/least_time.conf:
+upstream backend_methods_least_time {
+    zone   backend_methods 64k;
+    least_time header;
+    server 10.1.20.203:8080;
+    server 10.1.20.204:8080;
+}
+
+
+server {
+    listen    9025;
+    server_name _;
+
+    status_zone status_methods_least_time;
+
+    location /foo {
+        status_zone status_methods_least_time_foo;
+        proxy_pass http://backend_methods_least_time;
+    }
+}
+
+# configuration file /etc/nginx/gw-methods.d/random.conf:
+upstream backend_methods_random {
+    zone   backend_methods 64k;
+    random two least_time=last_byte; 
+    server 10.1.20.203:8080;
+    server 10.1.20.204:8080;
+}
+
+
+server {
+    listen    9026;
+    server_name _;
+
+    status_zone status_methods_random;
+
+    location /foo {
+        status_zone status_methods_random_foo;
+        proxy_pass http://backend_methods_random;
+    }
+}
+
+# configuration file /etc/nginx/gw-methods.d/rr.conf:
+upstream backend_methods_rr {
+    zone   backend_methods 64k;
+    server 10.1.20.203:8080;
+    server 10.1.20.204:8080;
+}
+
+
+server {
+    listen    9021;
+    server_name _;
+
+    status_zone status_methods_rr;
+
+    location /foo {
+        status_zone status_methods_rr_foo;
+        proxy_pass http://backend_methods_rr;
+    }
+
+}
+
+# configuration file /etc/nginx/gw-methods.d/weight.conf:
+upstream backend_methods_weight {
+    zone   backend_methods 64k;
+    server 10.1.20.203:8080 weight=5;
+    server 10.1.20.204:8080 weight=1;
+}
+
+
+server {
+    listen    9027;
+    server_name _;
+
+    status_zone status_methods_weight;
+
+    location /foo {
+        status_zone status_methods_weight_foo;
+        proxy_pass http://backend_methods_weight;
+    }
+}
+
+# configuration file /etc/nginx/gw-preserve.d/xff.conf:
+upstream backendXFF {
+  zone upstream_backendXFF 64k;
+  server 10.1.20.203:8080;
+  server 10.1.20.204:8080;
+}
+
+server {
+  listen 9031;
+  status_zone server_backendXFF;
+  location / {
+    status_zone location_backendXFF;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_pass http://backendXFF;
+  }
+}
+
+
+# configuration file /etc/nginx/gw-type.d/stream/tcp.conf:
+upstream backendTCP {
+  zone upstream_backendTCP 64k;
+  server 10.1.20.203:5001;
+  server 10.1.20.204:5001;
+}
+
+server {
+  listen 9042;
+  status_zone server_backendTCP;
+  proxy_pass  backendTCP;
+}
+
+
+# configuration file /etc/nginx/gw-type.d/stream/udp.conf:
+upstream backendUDP {
+  zone upstream_backendUDP 64k;
+  server 10.1.20.203:5001;
+  server 10.1.20.204:5001;
+}
+
+server {
+  listen 9042 udp;
+  status_zone server_backendUDP;
+  proxy_pass  backendUDP;
+}
+
+
+# configuration file /etc/nginx/gw-health.d/stream/tcp1.conf:
+upstream backendTCP1 {
+  zone upstream_backendTCP1 64k;
+  server 10.1.20.203:8080 max_fails=2 fail_timeout=30s slow_start=30s;
+  server 10.1.20.204:8080 max_fails=2 fail_timeout=30s slow_start=30s;
+}
+
+server {
+  listen 9055;
+  status_zone server_backendTCP1;
+  proxy_pass  backendTCP1;
+}
+
+
+# configuration file /etc/nginx/gw-health.d/stream/tcp2.conf:
+upstream backendTCP2 {
+  zone upstream_backendTCP2 64k;
+  server 10.1.20.203:8080 ;
+  server 10.1.20.204:8080 ;
+}
+
+server {
+  listen 9056;
+  status_zone server_backendTCP2;
+  proxy_pass  backendTCP2;
+  health_check interval=10 passes=2 fails=3;
+  health_check_timeout 5s;
+}
+
+
+# configuration file /etc/nginx/gw-health.d/stream/udp1.conf:
+upstream backendUDP1 {
+  zone upstream_backendUDP1 64k;
+  server 10.1.20.203:5001 max_fails=2 fail_timeout=30s;
+  server 10.1.20.204:5001 max_fails=2 fail_timeout=30s;
+}
+
+server {
+  listen 9057 udp;
+  status_zone server_backendUDP1;
+  proxy_pass  backendUDP1;
+}
+
+
+# configuration file /etc/nginx/gw-health.d/stream/udp2.conf:
+upstream backendUDP2 {
+  zone upstream_backendUDP2 64k;
+  server 10.1.20.203:5001;
+  server 10.1.20.204:5001;
+}
+
+server {
+  listen 9058 udp;
+  status_zone server_backendUDP2;
+  proxy_pass  backendUDP2;
+  health_check interval=20 passes=2 fails=2 udp;
+}
+
+

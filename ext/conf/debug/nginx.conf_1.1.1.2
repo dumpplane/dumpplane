@@ -1,0 +1,25 @@
+# configuration file /etc/nginx/nginx.conf:
+events {
+    worker_connections 1024;
+}
+
+http {
+    include conf.d/*.conf;
+}
+
+# configuration file /etc/nginx/conf.d/servers.conf:
+server {
+    listen 8080;
+    location / {
+        try_files 'foo bar' baz;
+    }
+}
+
+server {
+    listen 8081;
+    location / {
+        return 200 'success!';
+    }
+}
+
+# configuration file /etc/nginx/conf.d/test.conf 
