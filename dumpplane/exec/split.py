@@ -1,6 +1,7 @@
 
 import os
 import re
+import base64
 
 lists = []
 
@@ -19,7 +20,7 @@ def extractFilepathName(item):
         filename = os.path.basename(filepath)
     return (filepath, dirname, filename)
 
-def split_file(file, out):
+def split_file(file, out, dump):
     filename = os.path.basename(file)
     output = os.path.join( out, filename )
     if not os.path.exists(output):
@@ -55,6 +56,9 @@ def split_file(file, out):
         elif conf_path_details[1] in basePath:
             basePath = conf_path_details[1]
 
+        if not dump:
+            conf_data_detail = base64.b64encode(bytes(conf_data_detail,'utf-8')).decode()
+
         rawconfig.append({'filepath': conf_path_details[0], 'dirname': conf_path_details[1], 'filename': conf_path_details[2], 'separator': item, 'content': conf_data_detail})
 
     config['basePath'] = basePath
@@ -85,17 +89,17 @@ def dump_to_disk():
 
 
 
-def spliti_files(conf, out):
+def spliti_files(conf, out, dump):
     for filename in os.listdir(conf):
         f = os.path.join(conf, filename)
         if os.path.isfile(f):
-            split_file(f, out)
+            split_file(f, out, dump)
         else:
-            spliti_files(f, out)
+            spliti_files(f, out, dump)
 
 
 def split(conf, out, dump):
-    spliti_files(conf, out)
+    spliti_files(conf, out, dump)
     if dump:
         dump_to_disk()
     return lists
