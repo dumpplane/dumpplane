@@ -69,3 +69,12 @@ python3 -m dumpplane dump config/conf -o http://localhost:9200
 python3 -m dumpplane dump config/conf -o http://localhost:9200 --db nginx
 ----
 
+== How to make a release
+
+[source, bash]
+.*Test*
+----
+cd tests/testwhl/ && python3 setup.py sdist bdist_wheel
+----
+
+long_description_content_type

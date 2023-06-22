@@ -1,6 +1,8 @@
-#!/usr/bin/python3
 
-import exec
+import os
 
-exec.split()
-exec.dump()
+def test():
+    print(os.path.dirname(__file__))
+    print(__file__)
+    print(__name__)
+    print(__doc__)
