@@ -3,6 +3,8 @@ import os
 import json
 
 from pymongo.mongo_client import MongoClient
+from elasticsearch import Elasticsearch
+
 from .split import split
 
 def dump_to_mongodb(config, conn, db_name, table_name):
@@ -12,9 +14,10 @@ def dump_to_mongodb(config, conn, db_name, table_name):
     matched_count = collection.replace_one(filter, config, True).matched_count
     print("dump " + config['dumpFileName'] + " to mongodb, modified: " + str(matched_count))
 
-def dump_to_elastic(config, conn):
-    #print(config, conn)
-    print("ELASTIC")
+def dump_to_elastic(config, conn, index_name):
+    index_id = config['dumpFileName'] 
+    resp = conn.index(index=index_name, id=index_id, document=config)
+    print("dump " + index_id + " to elasticsearch, version: " + str(resp['_version']))
 
 def dump_to_file(config, out):
     dumpFileName = config['dumpFileName'] + ".json"
@@ -32,7 +35,7 @@ def init_conn(out):
         conn_mongo = MongoClient(out)
         print("create connection " + out)
     elif out.startswith("http://") or out.startswith("https://") :
-        conn_elastic = None
+        conn_elastic = Elasticsearch(out)
     else:
         conn_file = out
 
@@ -57,7 +60,7 @@ def dump(conf, input, out, db_name, table_name):
         if conn_tuple[0] is not None and conn_tuple[1] is None and conn_tuple[2] is None:
             dump_to_mongodb(config, conn_tuple[0], db_name, table_name)
         elif conn_tuple[0] is None and conn_tuple[1] is not None and conn_tuple[2] is None:
-            dump_to_elastic(config, conn_tuple[1])
+            dump_to_elastic(config, conn_tuple[1], db_name)
         elif conn_tuple[0] is None and conn_tuple[1] is None and conn_tuple[2] is not None:
             dump_to_file(config, conn_tuple[2])
         else:

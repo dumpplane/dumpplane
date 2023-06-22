@@ -24,7 +24,42 @@ commands:
 [source, bash]
 ----
 python3 dumpplane split ext/conf
+
 for i in $(ls ~/.dumpplane/data/) ; do crossplane parse -o ~/.dumpplane/data/$i.json ~/.dumpplane/data/$i/nginx.conf ; done 
+
 python3 dumpplane dump ext/conf 
 python3 dumpplane dump ext/conf -o mongodb://127.0.0.1:27017 
+python3 dumpplane dump ext/conf -o http://localhost:9200
+python3 dumpplane dump ext/conf -o http://localhost:9200 --db nginx 
+----
+
+== Data Store Setup
+
+[source, bash]
+.*MongoDB*
+----
+mkdir nginx/
+mongod --dbpath nginx/
+
+mongosh
+----
+
+[source, bash]
+.*ElasticSearch*
+----
+cd elasticsearch-7.17.10
+
+// configuration
+xpack.ml.enabled: false
+xpack.security.enabled: false
+ingest.geoip.downloader.enabled: false
+
+./bin/elasticsearch
+
+curl http://127.0.0.1:9200
+
+cd kibana-7.17.10-darwin-x86_64
+./bin/kibana
+
+http://localhost:5601
 ----
