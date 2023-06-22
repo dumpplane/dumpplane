@@ -1,4 +1,4 @@
-= Developer Guide
+= Pipleline Developer Guide
 
 == Run dumpplane code
 
@@ -23,14 +23,13 @@ commands:
 
 [source, bash]
 ----
-python3 dumpplane split ext/conf
+python3 dumpplane split config/conf
 
 for i in $(ls ~/.dumpplane/data/) ; do crossplane parse -o ~/.dumpplane/data/$i.json ~/.dumpplane/data/$i/nginx.conf ; done 
 
-python3 dumpplane dump ext/conf 
-python3 dumpplane dump ext/conf -o mongodb://127.0.0.1:27017 
-python3 dumpplane dump ext/conf -o http://localhost:9200
-python3 dumpplane dump ext/conf -o http://localhost:9200 --db nginx 
+python3 dumpplane dump config/conf 
+python3 dumpplane dump config/conf -o mongodb://127.0.0.1:27017 
+python3 dumpplane dump config/conf -o http://localhost:9200
 ----
 
 == Data Store Setup
