@@ -1,11 +1,11 @@
-
+import sys
 import os
 import json
 
 from pymongo.mongo_client import MongoClient
 from elasticsearch import Elasticsearch
 
-from .split import split
+from .split import split, get_dumpplane_data_folder_path
 
 def dump_to_mongodb(config, conn, db_name, table_name):
     db = conn[db_name]
@@ -27,6 +27,10 @@ def dump_to_file(config, out):
     file.write(json_data)
     print("dump " + dumpFileName + " to " + out)
 
+def create_folders(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
+
 def init_conn(out):
     conn_mongo = None
     conn_elastic = None
@@ -36,14 +40,34 @@ def init_conn(out):
         print("create connection " + out)
     elif out.startswith("http://") or out.startswith("https://") :
         conn_elastic = Elasticsearch(out)
+    elif out.startswith("file://"):
+        conn_file = out.lstrip("file://")
+        create_folders(conn_file)
     else:
         conn_file = out
+        create_folders(conn_file)
 
     return (conn_mongo, conn_elastic, conn_file)
 
+
 def dump(conf, input, out, db_name, table_name):
+
+    if input is None:
+        input = get_dumpplane_data_folder_path()
+
+    if out is None:
+        current_directory = os.path.dirname(os.path.abspath(sys.argv[0]))
+        out = os.path.join( current_directory, 'output' )
+
+    if db_name is None:
+        db_name = "nginx"
+
+    if table_name is None:
+        table_name = "configurations"
+
     config_list = split(conf, input, False)
     conn_tuple = init_conn(out)
+
     for config in config_list:
         diskPath = config['diskPath']
         dumpFileName = config['dumpFileName']

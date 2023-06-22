@@ -1,4 +1,4 @@
-
+import sys
 import os
 import re
 import base64
@@ -97,9 +97,22 @@ def spliti_files(conf, out, dump):
         else:
             spliti_files(f, out, dump)
 
+def get_dumpplane_data_folder_path():
+    home_directory = os.path.expanduser( '~' )
+    out = os.path.join( home_directory, '.dumpplane', 'data' )
+    return out
 
 def split(conf, out, dump):
+
+    if out is None:
+        out = get_dumpplane_data_folder_path()
+
+    if not os.path.exists(out):
+        os.makedirs(out)
+
     spliti_files(conf, out, dump)
+
     if dump:
         dump_to_disk()
+
     return lists
