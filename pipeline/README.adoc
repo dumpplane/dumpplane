@@ -4,7 +4,8 @@
 
 [source, bash]
 ----
-$ python3 dumpplane -h
+$ cd pipeline 
+$ python3 -m dumpplane -h
 usage: dumpplane <command> [options]
 
 various operations for nginx config files
@@ -54,17 +55,17 @@ http://localhost:5601
 
 [source, bash]
 ----
-python3 dumpplane split config/conf
+python3 -m dumpplane split config/conf
 
 for i in $(ls ~/.dumpplane/data/) ; do crossplane parse -o ~/.dumpplane/data/$i.json ~/.dumpplane/data/$i/nginx.conf ; done 
 
-python3 dumpplane dump config/conf 
-python3 dumpplane dump config/conf -o file://output
+python3 -m dumpplane dump config/conf 
+python3 -m dumpplane dump config/conf -o file://output
 
-python3 dumpplane dump config/conf -o mongodb://127.0.0.1:27017 
-python3 dumpplane dump config/conf -o mongodb://127.0.0.1:27017 --db nginx --table configurations
+python3 -m dumpplane dump config/conf -o mongodb://127.0.0.1:27017 
+python3 -m dumpplane dump config/conf -o mongodb://127.0.0.1:27017 --db nginx --table configurations
 
-python3 dumpplane dump config/conf -o http://localhost:9200
-python3 dumpplane dump config/conf -o http://localhost:9200 --db nginx
+python3 -m dumpplane dump config/conf -o http://localhost:9200
+python3 -m dumpplane dump config/conf -o http://localhost:9200 --db nginx
 ----
 

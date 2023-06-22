@@ -1,14 +1,18 @@
 #!/usr/bin/python3
 
-import exec
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from traceback import format_exception
 
+from . import __version__
+from .split import split as split_exec
+from .dump import dump as dump_exec
+
+
 def split(filename, out):
-    exec.split(filename, out, True)
+    split_exec(filename, out, True)
 
 def dump(filename, input, out, db, table):
-    exec.dump(filename, input, out, db, table)
+    dump_exec(filename, input, out, db, table)
 
 
 class _SubparserHelpFormatter(RawDescriptionHelpFormatter):
@@ -30,7 +34,7 @@ def parse_args(args=None):
         description='various operations for nginx config files',
         usage='%(prog)s <command> [options]'
     )
-    parser.add_argument('-V', '--version', action='version', version='%(prog)s ' + exec.__version__)
+    parser.add_argument('-V', '--version', action='version', version='%(prog)s ' + __version__)
     subparsers = parser.add_subparsers(title='commands')
 
     def create_subparser(function, help):
