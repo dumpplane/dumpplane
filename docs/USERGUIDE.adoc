@@ -112,17 +112,16 @@ Refer blow steps to run `dumpplane`.
 
 [source, bash]
 ----
-$ ls input/
-nginx.conf_10.1.10.171	nginx.conf_10.1.10.195	nginx.conf_10.1.10.8
+ls pipeline/config/conf 
 ----
 
-NOTE: `input` is folder, which contains 3 files, each file are output of `nginx -T`.
+NOTE: ` pipeline/config/conf ` is folder, which contains nginx -T files, each file are output of `nginx -T`.
 
-=== Step 2: dumpplane parse
+=== Step 2: dumpplane split
 
 [source, bash]
 ----
-$ dumpplane parse input
+$ dumpplane split pipeline/config/conf 
 
 split nginx.conf_10.1.10.171 to data/nginx.conf_10.1.10.171, total blocks: 6
 split nginx.conf_10.1.10.8 to data/nginx.conf_10.1.10.8, total blocks: 8
@@ -133,10 +132,8 @@ split nginx.conf_10.1.10.195 to data/nginx.conf_10.1.10.195, total blocks: 58
 
 [source, bash]
 ----
-for i in $(ls data/) ; do crossplane parse -o data/$i.json data/$i/nginx.conf; done 
+for i in $(ls ~/.dumpplane/data/) ; do crossplane parse -o ~/.dumpplane/data/$i.json ~/.dumpplane/data/$i/nginx.conf ; done
 ----
-
-NOTE: The *data* is dumpplane output file path, recommended crossplane output file are same as dumpplane output file path, or else you need specify `--cpout` while running dumpplane dump.
 
 NOTE: Current crossplane parse output must equals `nginx -T` plus `.json`.
 

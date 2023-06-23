@@ -2,6 +2,7 @@ package io.cloudadc.dumpplane.drools.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
@@ -49,6 +50,7 @@ public class NginxConfigurationController {
         
         kieSession.fireAllRules();
         kieSession.dispose();
-        return results;
+        
+        return results.stream().filter(r -> r.getResults() != null).collect(Collectors.toList());
 	}
 }

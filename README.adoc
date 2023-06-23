@@ -47,7 +47,7 @@ Refer blow steps to run `dumpplane`.
 
 [source, bash]
 ----
-$ ls input/
+$ ls pipeline/config/conf
 nginx.conf_10.1.10.171	nginx.conf_10.1.10.195	nginx.conf_10.1.10.8
 ----
 

@@ -89,32 +89,22 @@ python3 setup.py sdist bdist_wheel
 
 === Run Rate 
 
-1. Create View `configurationnginxconf` via link:ddl/mongodb/configurationsnginxconf.json[ddl/mongodb/configurationsnginxconf.json] aggregation pipeline.
+*1. Create View*
+
+Create View `configurationnginxconf` via link:ddl/mongodb/configurationsnginxconf.json[ddl/mongodb/configurationsnginxconf.json] aggregation pipeline.
 
 [source, bash]
-.*Run*
+.*2. Start Rate App*
 ----
-java  -Drate.algorithm.sheets=rules/test.xls -jar target/dumpplane-app-rate-0.1.jar
-----
-
-[source, bash]
-.*Test 1*
-----
- % curl -s "http://localhost:8080/getFDInterestRate?process=auto&connections=1024" | jq
-{
-  "worker_processes": "auto",
-  "worker_connections": 1024,
-  "results": "NOT PERFORMANCE TUNING"
-}
+cd apps/rate 
+mvn clean install && java -Drate.algorithm.sheets=rules/nginx-ops.xlsx -jar target/dumpplane-app-rate-0.1.jar 
 ----
 
+NOTE: The swagger ui can be accessed from http://127.0.0.1:8080/swagger-ui.html
+
 [source, bash]
-.*Test 2*
+.*3. Performance Tuning Validation*
 ----
-% curl -s "http://localhost:8080/getFDInterestRate?process=auto&connections=1023" | jq
-{
-  "worker_processes": "auto",
-  "worker_connections": 1023,
-  "results": null
-}
+curl -s -X 'GET'  'http://127.0.0.1:8080/rate/performance/tuning' -H 'accept: application/json' | jq
 ----
+
