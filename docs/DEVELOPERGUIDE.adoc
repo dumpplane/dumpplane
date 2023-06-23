@@ -1,6 +1,8 @@
-= Pipleline Developer Guide
+= Developer Guide
 
-== Run dumpplane code
+== Pipeline
+
+=== Run dumpplane code
 
 [source, bash]
 ----
@@ -20,7 +22,7 @@ commands:
   help               show help for commands
 ----
 
-== Data Store Setup
+=== Data Store Setup
 
 [source, bash]
 .*MongoDB*
@@ -51,7 +53,7 @@ cd kibana-7.17.10-darwin-x86_64
 http://localhost:5601
 ----
 
-== Run pipeline
+=== Run pipeline
 
 [source, bash]
 ----
@@ -81,4 +83,38 @@ cd tests/testwhl/ && python3 setup.py sdist bdist_wheel
 .*Production*
 ----
 python3 setup.py sdist bdist_wheel
+----
+
+== App
+
+=== Run Rate 
+
+1. Create View `configurationnginxconf` via link:ddl/mongodb/configurationsnginxconf.json[ddl/mongodb/configurationsnginxconf.json] aggregation pipeline.
+
+[source, bash]
+.*Run*
+----
+java  -Drate.algorithm.sheets=rules/test.xls -jar target/dumpplane-app-rate-0.1.jar
+----
+
+[source, bash]
+.*Test 1*
+----
+ % curl -s "http://localhost:8080/getFDInterestRate?process=auto&connections=1024" | jq
+{
+  "worker_processes": "auto",
+  "worker_connections": 1024,
+  "results": "NOT PERFORMANCE TUNING"
+}
+----
+
+[source, bash]
+.*Test 2*
+----
+% curl -s "http://localhost:8080/getFDInterestRate?process=auto&connections=1023" | jq
+{
+  "worker_processes": "auto",
+  "worker_connections": 1023,
+  "results": null
+}
 ----

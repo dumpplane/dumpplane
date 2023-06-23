@@ -1,0 +1,24 @@
+[
+    {
+      $project: {
+        _id: 0,
+        dumpFileName: 1,
+        ngxHost: 1,
+        config: '$crossplane.config'
+      }
+    },
+    { $unwind: { path: '$config' } },
+    {
+      $addFields: {
+        conf_file: '$config.file',
+        conf_directive: '$config.parsed'
+      }
+    },
+    {
+      $match: {
+        conf_file: { $regex: 'nginx.conf$' }
+      }
+    },
+    { $unwind: { path: '$conf_directive' } },
+    { $project: { config: 0 } }
+  ]
