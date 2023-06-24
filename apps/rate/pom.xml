@@ -3,22 +3,13 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.7.12</version>
-		<relativePath/> <!-- lookup parent from repository -->
-	</parent>
-	<groupId>io.github.cloudadc</groupId>
+        <groupId>io.github.cloudadc</groupId>
+        <artifactId>dumpplane-app-parent</artifactId>
+        <version>0.0.1</version>
+    </parent>
 	<artifactId>dumpplane-app-rate</artifactId>
-	<version>0.1</version>
-	<name>dumpplane rate</name>
+	<name>dumpplane app rate</name>
 	<description>Rate Algorithm Based Configuration Management</description>
-
-	<properties>
-		<java.version>11</java.version>
-		<drools.version>7.73.0.Final</drools.version>	
-		<springdoc-openapi-ui.version>1.6.9</springdoc-openapi-ui.version>
-	</properties>
 
 	<dependencies>
 	    <dependency>
@@ -29,7 +20,6 @@
 		<dependency>
 		    <groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-ui</artifactId>
-			<version>${springdoc-openapi-ui.version}</version>
 		</dependency>
 
         <dependency>
@@ -41,17 +31,14 @@
        <dependency>
           <groupId>org.drools</groupId>
           <artifactId>drools-core</artifactId>
-          <version>${drools.version}</version>
        </dependency>
        <dependency>
           <groupId>org.drools</groupId>
           <artifactId>drools-compiler</artifactId>
-          <version>${drools.version}</version>
        </dependency>
        <dependency>
           <groupId>org.drools</groupId>
           <artifactId>drools-decisiontables</artifactId>
-          <version>${drools.version}</version>
        </dependency>
        
        <dependency>

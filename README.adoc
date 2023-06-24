@@ -57,7 +57,7 @@ NOTE: `input` is folder, which contains 3 files, each file are output of `nginx 
 
 [source, bash]
 ----
-$ dumpplane split input
+$ dumpplane split pipeline/config/conf
 ----
 
 === Step 3: crossplane parse

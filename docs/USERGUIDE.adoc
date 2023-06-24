@@ -141,7 +141,7 @@ NOTE: Current crossplane parse output must equals `nginx -T` plus `.json`.
 
 [source, bash]
 ----
-$ dumpplane dump input
+$ dumpplane dump pipeline/config/conf -o mongodb://127.0.0.1:27017
 
 write nginx.conf_10.1.10.171 to DB was acknowledged, matched count: 0
 write nginx.conf_10.1.10.8 to DB was acknowledged, matched count: 0

@@ -97,7 +97,7 @@ Create View `configurationnginxconf` via link:ddl/mongodb/configurationsnginxcon
 .*2. Start Rate App*
 ----
 cd apps/rate 
-mvn clean install && java -Drate.algorithm.sheets=rules/nginx-ops.xlsx -jar target/dumpplane-app-rate-0.1.jar 
+mvn clean install && java -Drate.algorithm.sheets=rules/nginx-ops.xlsx -jar target/dumpplane-app-rate-0.0.1.jar 
 ----
 
 NOTE: The swagger ui can be accessed from http://127.0.0.1:8080/swagger-ui.html

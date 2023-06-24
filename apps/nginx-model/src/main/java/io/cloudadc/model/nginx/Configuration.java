@@ -1,4 +1,4 @@
-package io.cloudadc.dumpplane.drools.model;
+package io.cloudadc.model.nginx;
 
 import java.io.Serializable;
 
