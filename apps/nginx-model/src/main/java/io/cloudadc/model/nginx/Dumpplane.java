@@ -17,13 +17,13 @@ public class Dumpplane implements Serializable {
 
 	private Integer conf_num;
 	
-	private List<Dumpplane> rawconfig = new ArrayList<>();
+	private List<RawConfig> rawconfig = new ArrayList<>();
 	
 	public Dumpplane() {
 		
 	}
 
-	public Dumpplane(Integer conf_num, List<Dumpplane> rawconfig) {
+	public Dumpplane(Integer conf_num, List<RawConfig> rawconfig) {
 		super();
 		this.conf_num = conf_num;
 		this.rawconfig = rawconfig;
@@ -37,11 +37,11 @@ public class Dumpplane implements Serializable {
 		this.conf_num = conf_num;
 	}
 
-	public List<Dumpplane> getRawconfig() {
+	public List<RawConfig> getRawconfig() {
 		return rawconfig;
 	}
 
-	public void setRawconfig(List<Dumpplane> rawconfig) {
+	public void setRawconfig(List<RawConfig> rawconfig) {
 		this.rawconfig = rawconfig;
 	}
 

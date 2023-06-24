@@ -1,15 +1,23 @@
-= NGINX Dump Plane
+= What's dumpplane?
 :toc: manual
 
 image:ext/dumpplane-logo.png[Dumpplane logo]
 
-== What's dumpplane?
+*Dumpplane* provides cloud native configuration management for popular opensource software via `opensource software configuration *modeling*`, `customized *pipeline* to dump configuration to Real Time Data Store(MongoDB, ElasticSearch, BigTable)` and `AI based Intelligent *App*`, which enables Ops Manage and Govern NGINX with a Modern No-SQL Data Analysis/Modern Observability/Modern AIOps Way.
 
-The `dumpplane` is a tool work with link:https://github.com/nginxinc/crossplane[crossplane] to model and dump nginx configuration to Real Time Data Store(MongoDB, ElasticSearch, BigTable), which enables Ops Manage and Govern NGINX with a Modern No-SQL Data Analysis/Modern Observability/Modern AIOps Way.
+== Models
 
-image:ext/dumpplane-pipeline.png[]
+|===
+|Opensource |Schema |Version
 
-The `nginx -T` output should same to a file and copy to a directory, which used as input of `dumpplane` tool, then the `dumpplane` and `crossplane` will transfer `nginx -T` output to Real Time Data Store finally.
+|Nginx
+|link:models/dumpplane_model_nginx_0.0.1.json[dumpplane_model_nginx_0.0.1.json]
+|0.0.1
+
+|===
+
+
+== Pipeline
 
 [source, bash]
 .*Install*
@@ -37,13 +45,11 @@ commands:
 ----
 
 
-== How to run?
-
-In order to run `dumpplane`, you need make sure all link:#prerequisites-for-run-dumpplane[prerequisites for run dumpplane] are satisfied.
+In order to run `dumpplane`, you need make sure all link:docs/USERGUIDE.adoc#prerequisites-for-run-dumpplane[prerequisites for run dumpplane] are satisfied.
 
 Refer blow steps to run `dumpplane`.
 
-=== Step 1: prepare nginx dump file
+=== Step 1: reap
 
 [source, bash]
 ----
@@ -51,16 +57,16 @@ $ ls pipeline/config/conf
 nginx.conf_10.1.10.171	nginx.conf_10.1.10.195	nginx.conf_10.1.10.8
 ----
 
-NOTE: `input` is folder, which contains 3 files, each file are output of `nginx -T`.
+NOTE: `pipeline/config/conf` is folder, which contains 3 files, each file are output of `nginx -T`.
 
-=== Step 2: dumpplane split
+=== Step 2: split
 
 [source, bash]
 ----
 $ dumpplane split pipeline/config/conf
 ----
 
-=== Step 3: crossplane parse
+=== Step 3: parse
 
 [source, bash]
 ----
@@ -71,7 +77,7 @@ NOTE: The *data* is dumpplane output file path, recommended crossplane output fi
 
 NOTE: Current crossplane parse output must equals `nginx -T` plus `.json`.
 
-=== Step 4: dumpplane dump
+=== Step 4: dump
 
 [source, bash]
 ----
@@ -84,612 +90,20 @@ NOTE: `nginx -T` output file name used as a primary key, which means if same fil
 
 NOTE: Run `dumpplane dump` with argument `-o http://localhost:9200 --db nginx` will index all configurations to ElasticSearch.
 
-=== Step 5: nginx management & governance
 
-Refer to link:#nginx-management-governance[NGINX Management & Governance].
+== Apps
 
-== NGINX Management & Governance
+=== Rate
 
-=== Total NGINX Host
+Rate app is a link:https://en.wikipedia.org/wiki/Generic_cell_rate_algorithm[rate algorithm] based app that can make Opensource configuration management more intelligent.
 
-[source, sql]
-----
-nginx> db.configurations.countDocuments()
-31
-----
+1. The Ops define the configuration management rule via Excel(eg: link:apps/rate/rules/nginx-ops.xlsx[apps/rate/rules/nginx-ops.xlsx])
+2. The `Rate app` load the rule and fire all facts from *pipeline* drived real time data store.
 
-=== NGINX Configration Files View
+Refer to link:docs/DEVELOPERGUIDE.adoc#run-rate[Run Rate App] for more details  
 
-[source, sql]
-.*SQL*
-----
-var pipeline = [
-  {$addFields: 
-    {
-      status: '$crossplane.status',
-      errors: '$crossplane.errors',
-      config: '$crossplane.config'
-    }
-  }, 
-  {
-    $unwind: {
-      path: '$config',
-      includeArrayIndex: 'row',
-      preserveNullAndEmptyArrays: true
-    }
-  }, 
-  {
-    $addFields: {
-      fileStatus: '$config.status',
-      content: '$config.parsed',
-      filePath: '$config.file'
-    }
-  }, 
-  {
-    $project: {
-      crossplane: 0,
-      dumpplane: 0,
-      config: 0
-    }
-  }
-]
-----
+=== SQL Aggregation
 
-[source, sql]
-.*Create View*
-----
-db.createView("configurationFiles", "configurations", pipeline)
-----
+SQL Aggregation provide a series of SQL DML/DDL that can quick convert to real usage case scenrios.
 
-=== Total NGINX Configration Files
-
-[source, sql]
-----
-> db.configurationFiles.countDocuments()
-154
-----
-
-=== Top 5 configuration files with the most configuration blocks
-
-[source, sql]
-.*SQL*
-----
-var pipeline = [
-  {
-    $addFields: {
-      totalBlocks: {
-        $size: '$content'
-      }
-    }
-  }, 
-  {
-    $sort: {
-      totalBlocks: -1
-    }
-  }, 
-  {
-    $limit: 5
-  }, 
-  {
-    $project: {
-      _id: 0,
-      ngxHost: 1,
-      filePath: 1,
-      totalBlocks: 1
-    }
-  }
-]
-----
-
-[source, sql]
-.*Aggregate*
-----
-> db.configurationFiles.aggregate(pipeline)
-[
-  {
-    ngxHost: '15.55.40.185',
-    filePath: '/etc/nginx/conf.d/app.conf',
-    totalBlocks: 11
-  },
-  {
-    ngxHost: '104.3.42.121',
-    filePath: '/etc/nginx/conf.d/app.conf',
-    totalBlocks: 10
-  },
-  {
-    ngxHost: '103.10.16.101',
-    filePath: '/etc/nginx/conf.d/app.conf',
-    totalBlocks: 9
-  },
-  {
-    ngxHost: '10.1.10.195',
-    filePath: '/etc/nginx/nginx.conf',
-    totalBlocks: 9
-  },
-  {
-    ngxHost: '10.1.10.171',
-    filePath: '/etc/nginx/nginx.conf',
-    totalBlocks: 6
-  }
-]
-----
-
-=== Top 5 NGINX hosts with the most number of configuration files
-
-[source, sql]
-.*SQL*
-----
-var pipeline = [
-  {
-    $group: {
-      _id: '$ngxHost',
-      count: {
-        $count: {}
-      }
-    }
-  }, 
-  {
-    $sort: {
-      count: -1
-    }
-  },
-  {
-    $limit: 5
-  } 
-]
-----
-
-[source, sql]
-.*Aggregate*
-----
-> db.configurationFiles.aggregate(pipeline)
-[
-  { _id: '10.1.10.195', count: 58 },
-  { _id: '10.1.10.8', count: 8 },
-  { _id: '10.1.10.171', count: 6 },
-  { _id: '192.168.1.103', count: 3 },
-  { _id: '10.1.10.103', count: 3 }
-]
-----
-
-=== NGINX Configration Blocks View
-
-[source, sql]
-.*SQL*
-----
-var pipeline = [
-  {
-    $unwind: {
-      path: '$content',
-      includeArrayIndex: 'blockRow',
-      preserveNullAndEmptyArrays: true
-    }
-  }, 
-  {
-    $addFields: {
-      blockLineNumber: '$content.line',
-      blockDirective: '$content.directive',
-      blockArgs: '$content.args',
-      blockIncludes: '$content.includes',
-      subBlock: '$content.block'
-    }
-  }, 
-  {$project: {
-      content: 0
-    }
-  }
-]
-----
-
-[source, sql]
-.*Create View*
-----
-db.createView("configurationBlocks", "configurationFiles", pipeline)
-----
-
-=== Total NGINX Configration Blocks
-
-[source, sql]
-----
-> db.configurationBlocks.countDocuments()
-414
-----
-
-=== Total NGINX Configration http Blocks
-
-[source, sql]
-----
-> db.configurationBlocks.find({ blockDirective: {$eq: "http"}}).count()
-31
-----
-
-=== Total NGINX Configration stream Blocks
-
-[source, sql]
-----
-> db.configurationBlocks.find({ blockDirective: {$eq: "stream"}}).count()
-1
-----
-
-=== Total NGINX Configration server Blocks
-
-[source, sql]
-----
-> db.configurationBlocks.find({ blockDirective: {$eq: "server"}}).count()
-129
-----
-
-=== Total NGINX Configration upstream  Blocks
-
-[source, sql]
-----
-> db.configurationBlocks.find({ blockDirective: {$eq: "upstream"}}).count()
-53
-----
-
-=== NGINX Configration Directives View
-
-[source, sql]
-.*SQL*
-----
-var pipeline = [
-  {
-    $unwind: {
-      path: '$subBlock',
-      includeArrayIndex: 'directiveBlockLineNumber',
-      preserveNullAndEmptyArrays: true
-    }
-  }, 
-  {
-    $addFields: {
-      directiveBlockLineNumber: '$subBlock.line',
-      directiveBlockDirective: '$subBlock.directive',
-      directiveBlockArgs: '$subBlock.args',
-      directiveBlockIncludes: '$subBlock.includes',
-      directiveSubBlock: '$subBlock.block'
-    }
-  }, 
-  {
-    $project: {
-      subBlock: 0
-    }
-  }
-]
-----
-
-[source, sql]
-----
-db.createView("configurationDirectives", "configurationBlocks", pipeline)
-----
-
-=== Totoal NGINX Configration Directives
-
-[source, sql]
-----
-> db.configurationDirectives.countDocuments()
-3542
-----
-
-=== Top 5 Frequent Used Port
-
-[source, sql]
-.*SQL*
-----
-var pipeline = [
-  {
-    $match: {
-      blockDirective: {
-        $eq: 'server'
-      },
-      directiveBlockDirective: {
-        $eq: 'listen'
-      }
-    }
-  }, 
-  {
-    $addFields: {
-      listenPort: {
-        $arrayElemAt: ['$directiveBlockArgs', 0]
-      }
-    }
-  }, 
-  {
-    $group: {
-      _id: '$listenPort',
-      count: {
-        $count: {}
-      }
-    }
-  }, 
-  {
-    $sort: {
-      count: -1
-    }
-  }, 
-  {
-    $limit: 5
-  }
-]
-----
-
-[source, sql]
-.*Aggregate*
-----
-> db.configurationDirectives.aggregate(pipeline)
-[
-  { _id: '8080', count: 14 },
-  { _id: '9006', count: 6 },
-  { _id: '9004', count: 6 },
-  { _id: '9000', count: 6 },
-  { _id: '9003', count: 5 }
-]
-----
-
-=== NGINX go production configration validation
-
-[source, sql]
-.*1. Query all 3 host the the application go production related*
-----
-var pipeline = [
-{
-  $match: {
-    $and: [
-    {
-      directiveBlockDirective: { $eq: 'location'}
-    },
-    {
-      $or: [
-      {
-        ngxHost: {$eq: '10.55.140.71'}
-      },
-      {
-        ngxHost: {$eq: '10.55.140.72'}
-      },
-      {
-        ngxHost: {$eq: '10.55.140.73'}
-      }
-      ]
-    }
-    ]
-  }
-}, 
-{
-  $project: {
-    _id: 0,
-    ngxHost: 1,
-    filePath: 1,
-    blockDirective: 1,
-    directiveBlockDirective: 1,
-    configSize: {
-      $size: '$directiveSubBlock'
-    }
-  }
-}]
-----
-
-[source, sql]
-.*2. Find the difference*
-----
-> db.configurationDirectives.aggregate(pipeline)
-[
-  {
-    ngxHost: '10.55.140.72',
-    filePath: '/etc/nginx/conf.d/app.conf',
-    blockDirective: 'server',
-    directiveBlockDirective: 'location',
-    configSize: 2
-  },
-  {
-    ngxHost: '10.55.140.73',
-    filePath: '/etc/nginx/conf.d/app.conf',
-    blockDirective: 'server',
-    directiveBlockDirective: 'location',
-    configSize: 1
-  },
-  {
-    ngxHost: '10.55.140.71',
-    filePath: '/etc/nginx/conf.d/app.conf',
-    blockDirective: 'server',
-    directiveBlockDirective: 'location',
-    configSize: 2
-  }
-]
-----
-
-NOTE : Nginx on host `10.55.140.73` has 1 config items, the other has 2 items.
-
-
-[source, sql]
-.*3. SQL for find the configuration difference*
-----
-var pipeline = [
-{ 
-  $match: {
-    $and: [
-    { 
-      directiveBlockDirective: { $eq: 'location'}
-    },
-    { 
-      $or: [
-      { 
-        ngxHost: {$eq: '10.55.140.71'}
-      },
-      { 
-        ngxHost: {$eq: '10.55.140.72'}
-      },
-      { 
-        ngxHost: {$eq: '10.55.140.73'}
-      }
-      ]
-    }
-    ]
-  }
-},
-{
-   $unwind: {
-     path: '$directiveSubBlock',
-     includeArrayIndex: 'locationDirectiveRow',
-     preserveNullAndEmptyArrays: true
-  }
-},
-{
-  $project: {
-    _id: 0,
-    ngxHost: 1,
-    filePath: 1,
-    blockDirective: 1,
-    directiveBlockDirective: 1,
-    locationDirectiveRow: 1,
-    locationDirective: '$directiveSubBlock.directive',
-    locationDirectiveArgs: '$directiveSubBlock.args'
-  }
-}
-]
-----
-
-[source, sql]
-.*4. Find the difference*
-----
-> db.configurationDirectives.aggregate(pipeline)
-[
-  {
-    ngxHost: '10.55.140.72',
-    filePath: '/etc/nginx/conf.d/app.conf',
-    blockDirective: 'server',
-    directiveBlockDirective: 'location',
-    locationDirectiveRow: Long("0"),
-    locationDirective: 'status_zone',
-    locationDirectiveArgs: [ 'location_backend' ]
-  },
-  {
-    ngxHost: '10.55.140.72',
-    filePath: '/etc/nginx/conf.d/app.conf',
-    blockDirective: 'server',
-    directiveBlockDirective: 'location',
-    locationDirectiveRow: Long("1"),
-    locationDirective: 'proxy_pass',
-    locationDirectiveArgs: [ 'http://backend' ]
-  },
-  {
-    ngxHost: '10.55.140.73',
-    filePath: '/etc/nginx/conf.d/app.conf',
-    blockDirective: 'server',
-    directiveBlockDirective: 'location',
-    locationDirectiveRow: Long("0"),
-    locationDirective: 'proxy_pass',
-    locationDirectiveArgs: [ 'http://backend' ]
-  },
-  {
-    ngxHost: '10.55.140.71',
-    filePath: '/etc/nginx/conf.d/app.conf',
-    blockDirective: 'server',
-    directiveBlockDirective: 'location',
-    locationDirectiveRow: Long("0"),
-    locationDirective: 'status_zone',
-    locationDirectiveArgs: [ 'location_backend' ]
-  },
-  {
-    ngxHost: '10.55.140.71',
-    filePath: '/etc/nginx/conf.d/app.conf',
-    blockDirective: 'server',
-    directiveBlockDirective: 'location',
-    locationDirectiveRow: Long("1"),
-    locationDirective: 'proxy_pass',
-    locationDirectiveArgs: [ 'http://backend' ]
-  }
-]
-----
-
-NOTE: The `10.55.140.73` host lost the `status_zone` setting.
-
-=== NGINX Configration locations View
-
-[source, sql]
-.*SQL*
-----
-var pipeline = [
-  {
-    $match: {
-      directiveBlockDirective: {$eq: 'location' }
-    }
-  }, 
-  {
-    $unwind: {
-      path: '$directiveSubBlock',
-      includeArrayIndex: 'locationDirectiveRow',
-      preserveNullAndEmptyArrays: true
-    }
-  }, 
-  {
-    $addFields: {
-      locationDirective: '$directiveSubBlock.directive',
-      locationDirectiveArgs: '$directiveSubBlock.args',
-      locationDirectiveLine: '$directiveSubBlock.line'
-    }
-  }, 
-  {
-    $project: {
-      directiveSubBlock: 0
-    }
-  }
-]
-----
-
-[source, sql]
-.*Create View*
-----
-db.createView("configurationLocations", "configurationDirectives", pipeline)
-----
-
-=== Totoal Locations
-
-[source, sql]
-----
-> db.configurationLocations.countDocuments()
-338
-----
-
-=== Find the Different Location Configrtaion
-
-[source, sql]
-----
-> db.configurationLocations.find({$or: [{ngxHost: "15.55.140.71"}, {ngxHost: "15.55.140.72"}, {ngxHost: "15.55.140.73"}]},{_id: 0, ngxHost: 1, filePath: 1, blockDirective: 1, locationDirective: 1, locationDirectiveArgs: 1})
-[
-  {
-    ngxHost: '15.55.140.72',
-    filePath: '/etc/nginx/conf.d/app.conf',
-    blockDirective: 'server',
-    locationDirective: 'status_zone',
-    locationDirectiveArgs: [ 'location_backend' ]
-  },
-  {
-    ngxHost: '15.55.140.72',
-    filePath: '/etc/nginx/conf.d/app.conf',
-    blockDirective: 'server',
-    locationDirective: 'proxy_pass',
-    locationDirectiveArgs: [ 'http://backend' ]
-  },
-  {
-    ngxHost: '15.55.140.73',
-    filePath: '/etc/nginx/conf.d/app.conf',
-    blockDirective: 'server',
-    locationDirective: 'proxy_pass',
-    locationDirectiveArgs: [ 'http://backend' ]
-  },
-  {
-    ngxHost: '15.55.140.71',
-    filePath: '/etc/nginx/conf.d/app.conf',
-    blockDirective: 'server',
-    locationDirective: 'status_zone',
-    locationDirectiveArgs: [ 'location_backend' ]
-  },
-  {
-    ngxHost: '15.55.140.71',
-    filePath: '/etc/nginx/conf.d/app.conf',
-    blockDirective: 'server',
-    locationDirective: 'proxy_pass',
-    locationDirectiveArgs: [ 'http://backend' ]
-  }
-]
-----
-
+Refer to link:docs/USERGUIDE.adoc#nginx-management-governance[NGINX Management & Governance] for more details.
