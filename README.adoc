@@ -114,6 +114,6 @@ Refer to link:docs/USERGUIDE.adoc#nginx-management-governance[NGINX Management &
 
 == Contribute
 
-. Fork and clone(git clone git@github.com:<YOUR_ID>/docs.git)
-. Do some changes
+. Fork and clone(git clone git@github.com:<YOUR_ID>/dumpplane.git)
+. Do some changes or enhancement
 . Summit your change(link:https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests[about pull requests])
