@@ -81,15 +81,15 @@
                 "comment": { "type": "string", "minLength": 1 },
                 "args": {
                     "type": "array",
-                    items": { "type": "string", "minLength": 1 }
+                    "items": { "type": "string", "minLength": 1 }
                 },
                 "includes": {
                     "type": "array",
-                    items": { "type": "integer", "minimum": 0 }
+                    "items": { "type": "integer", "minimum": 0 }
                 },
                 "block": {
                     "type": "array",
-                    items": { "$ref": "#/definitions/block" }
+                    "items": { "$ref": "#/definitions/block" }
                 }
             }
         } 
