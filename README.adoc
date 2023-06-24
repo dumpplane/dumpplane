@@ -1,7 +1,7 @@
 = What's dumpplane?
 :toc: manual
 
-image:ext/dumpplane-logo.png[Dumpplane logo]
+image:docs/img/dumpplane-logo.png[Dumpplane logo]
 
 *Dumpplane* provides cloud native configuration management for popular opensource software via 
 
@@ -111,3 +111,9 @@ Refer to link:docs/DEVELOPERGUIDE.adoc#run-rate[Run Rate App] for more details
 SQL Aggregation provide a series of SQL DML/DDL that can quick convert to real usage case scenrios.
 
 Refer to link:docs/USERGUIDE.adoc#nginx-management-governance[NGINX Management & Governance] for more details.
+
+== Contribute
+
+. Fork and clone(git clone git@github.com:<YOUR_ID>/docs.git)
+. Do some changes
+. Summit your change(link:https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests[about pull requests])
