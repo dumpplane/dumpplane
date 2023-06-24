@@ -3,7 +3,13 @@
 
 image:ext/dumpplane-logo.png[Dumpplane logo]
 
-*Dumpplane* provides cloud native configuration management for popular opensource software via `opensource software configuration *modeling*`, `customized *pipeline* to dump configuration to Real Time Data Store(MongoDB, ElasticSearch, BigTable)` and `AI based Intelligent *App*`, which enables Ops Manage and Govern NGINX with a Modern No-SQL Data Analysis/Modern Observability/Modern AIOps Way.
+*Dumpplane* provides cloud native configuration management for popular opensource software via 
+
+. opensource software configuration *modeling* 
+. customized *pipeline* to dump configuration to Real Time Data Store(MongoDB, ElasticSearch, BigTable)
+. AI based Intelligent *App*
+
+which enables Ops Manage and Govern Opensource with a Modern No-SQL Data Analysis/Observability/AIOps Way.
 
 == Models
 
@@ -45,11 +51,9 @@ commands:
 ----
 
 
-In order to run `dumpplane`, you need make sure all link:docs/USERGUIDE.adoc#prerequisites-for-run-dumpplane[prerequisites for run dumpplane] are satisfied.
+To run `dumpplane`, you need make sure all link:docs/USERGUIDE.adoc#prerequisites-for-run-dumpplane[prerequisites for run dumpplane] are satisfied.
 
-Refer blow steps to run `dumpplane`.
-
-=== Step 1: reap
+=== reap
 
 [source, bash]
 ----
@@ -59,14 +63,14 @@ nginx.conf_10.1.10.171	nginx.conf_10.1.10.195	nginx.conf_10.1.10.8
 
 NOTE: `pipeline/config/conf` is folder, which contains 3 files, each file are output of `nginx -T`.
 
-=== Step 2: split
+=== split
 
 [source, bash]
 ----
 $ dumpplane split pipeline/config/conf
 ----
 
-=== Step 3: parse
+=== parse
 
 [source, bash]
 ----
@@ -77,7 +81,7 @@ NOTE: The *data* is dumpplane output file path, recommended crossplane output fi
 
 NOTE: Current crossplane parse output must equals `nginx -T` plus `.json`.
 
-=== Step 4: dump
+=== dump
 
 [source, bash]
 ----
