@@ -31,13 +31,13 @@ various operations for nginx config files
    ...
 ----
 
-=== reap development
+=== get development
 
 [source, bash]
 ----
-python3 -m dumpplane reap ~/.kube/config -t ingress -n "test-01,test-02"
+python3 -m dumpplane get ~/.kube/config -t ingress -n "test-01,test-02"
 
-python3 -m dumpplane reap ~/.kube/config -t ingress -n "test-01" -c 1
+python3 -m dumpplane get ~/.kube/config -t ingress -n "test-01" -c 1
 ----
 
 === Data Store Setup

@@ -53,7 +53,7 @@ commands:
 
 To run `dumpplane`, you need make sure all link:docs/USERGUIDE.adoc#prerequisites-for-run-dumpplane[prerequisites for run dumpplane] are satisfied.
 
-=== reap
+=== get
 
 [source, bash]
 ----

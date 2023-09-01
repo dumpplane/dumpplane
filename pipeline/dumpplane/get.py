@@ -51,7 +51,7 @@ def reap_gw_template(credentials, namespaces, outputToConsole):
 def reap_conf(credentials, namespaces, outputToConsole):
     print(credentials, namespaces, outputToConsole)
 
-def reap(credentials, type, namespaces, console):
+def get(credentials, type, namespaces, console):
 
     outputToConsole = False
     if console is not None and console > 0:
