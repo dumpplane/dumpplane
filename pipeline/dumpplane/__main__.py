@@ -6,7 +6,10 @@ from traceback import format_exception
 from . import __version__
 from .split import split as split_exec
 from .dump import dump as dump_exec
+from .reap import reap as reap_exec
 
+def reap(credentials, type, namespaces, console):
+    reap_exec(credentials, type, namespaces, console)
 
 def split(filename, out):
     split_exec(filename, out, True)
@@ -43,6 +46,12 @@ def parse_args(args=None):
         p = subparsers.add_parser(name, prog=prog, help=help, description=help)
         p.set_defaults(_subcommand=function)
         return p
+
+    p = create_subparser(reap, 'reap configuration either from nginx host, or kubernetes')
+    p.add_argument('credentials', help='the credentials files used to connect to kubernetes or nginx host')
+    p.add_argument('-t', '--type', type=str, help='the confgiuration type, avaliable type: conf, ingress, gw, default conf')
+    p.add_argument('-n', '--namespaces', type=str, help='the ccomma separated namespaces that hold ingress resource, or gateway template')
+    p.add_argument('-c', '--console', type=int, help='whether output to console, if value is large 0, the reap results will output to console')
 
     p = create_subparser(split, 'split a nginx dump(nginx -T) .conf to raw files')
     p.add_argument('filename', help='the nginx dump(nginx -T) folder')

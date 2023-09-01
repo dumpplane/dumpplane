@@ -2,24 +2,42 @@
 
 == Pipeline
 
-=== Run dumpplane code
+=== Development Environment Setup
 
 [source, bash]
+.*1. Clone Code*
 ----
-$ cd pipeline 
+git clone https://github.com/dumpplane/dumpplane.git
+ln -s dumpplane/pipeline/ p
+cd p/
+----
+
+[source, bash]
+.*2. Dependencies install*
+----
+pip install elasticsearch
+pip install pymongo
+pip install kubernetes
+----
+
+[source, bash]
+.*3. Run dumpplane code*
+----
 $ python3 -m dumpplane -h
 usage: dumpplane <command> [options]
 
 various operations for nginx config files
 
-optional arguments:
-  -h, --help         show this help message and exit
-  -V, --version      show program's version number and exit
+   ...
+----
 
-commands:
-  split              split a nginx dump(nginx -T) .conf to raw files
-  dump               dump crossplane parsed .json to data storage
-  help               show help for commands
+=== reap development
+
+[source, bash]
+----
+python3 -m dumpplane reap ~/.kube/config -t ingress -n "test-01,test-02"
+
+python3 -m dumpplane reap ~/.kube/config -t ingress -n "test-01" -c 1
 ----
 
 === Data Store Setup
