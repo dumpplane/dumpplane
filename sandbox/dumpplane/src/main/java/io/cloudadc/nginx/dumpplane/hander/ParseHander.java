@@ -108,8 +108,8 @@ public class ParseHander extends AbstractHander {
 
 		if(sb != null && configPath != null) {
 			String originalString = sb.toString();
-			String encodedString = Base64.getEncoder().encodeToString(originalString.getBytes());
-			Dumpplane block = new Dumpplane(configPath, encodedString);
+			//String encodedString = Base64.getEncoder().encodeToString(originalString.getBytes());
+			Dumpplane block = new Dumpplane(configPath, originalString);
 			config.addDump(block);
 			sb = null;
 			configPath = null;
