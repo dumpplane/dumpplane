@@ -44,24 +44,50 @@ optional arguments:
   -V, --version      show program's version number and exit
 
 commands:
-  split              split a nginx dump(nginx -T) .conf to raw files
-  dump               dump crossplane parsed .json to data storage
-  help               show help for commands
-
+  apply                 apply configuration either to nginx host, or kubernetes
+  get                   get configuration either from nginx host, or kubernetes
+  delete                delete configuration either from nginx host, or kubernetes
+  split                 split a nginx dump(nginx -T) .conf to raw files
+  dump                  dump crossplane parsed .json to data storage
+  help                  show help for commands
 ----
 
 
 To run `dumpplane`, you need make sure all link:docs/USERGUIDE.adoc#prerequisites-for-run-dumpplane[prerequisites for run dumpplane] are satisfied.
 
+=== apply
+
+[source, bash]
+----
+$ dumpplane apply ~/.kube/config -t ingress -f ~/n/test-20/ingress.yaml 
+gke_playground-s-11-856b83a7_us-central1-a_standard-cluster-1/test-20/networking.k8s.io/cafe-ingress created
+
+$ dumpplane apply ~/.kube/config -t ingress -f ~/n/test-20/ingress.yaml 
+gke_playground-s-11-856b83a7_us-central1-a_standard-cluster-1/test-20/networking.k8s.io/cafe-ingress updated
+----
+
 === get
 
 [source, bash]
 ----
-$ ls pipeline/config/conf
-nginx.conf_10.1.10.171	nginx.conf_10.1.10.195	nginx.conf_10.1.10.8
+$ dumpplane get ~/.kube/config -t ingress -n test-01,test-02,test-20
+gke_playground-s-11-856b83a7_us-central1-a_standard-cluster-1_test-01_cafe-ingress.json
+gke_playground-s-11-856b83a7_us-central1-a_standard-cluster-1_test-02_cafe-ingress.json
+gke_playground-s-11-856b83a7_us-central1-a_standard-cluster-1_test-20_cafe-ingress.json
 ----
 
-NOTE: `pipeline/config/conf` is folder, which contains 3 files, each file are output of `nginx -T`.
+[source, bash]
+----
+$ dumpplane get ~/.kube/config -t ingress -n test-01 -c 1
+----
+
+=== delete
+
+[source, bash]
+----
+$ dumpplane delete ~/.kube/config -t ingress -f ~/n/test-20/ingress.yaml 
+gke_playground-s-11-856b83a7_us-central1-a_standard-cluster-1/test-20/networking.k8s.io/cafe-ingress deleted
+----
 
 === split
 

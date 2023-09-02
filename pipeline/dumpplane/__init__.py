@@ -5,10 +5,10 @@ from .dump import dump
 __all__ = ['split', 'dump']
 
 __title__ = 'dumpplane'
-__summary__ = 'Management and Governance NGINX with a Modern Analysis Way'
+__summary__ = 'Management and Governance NGINX with Modern Way'
 __url__ = 'https://github.com/kylinsoong/dumpplane'
 
-__version__ = '0.0.1'
+__version__ = '0.0.2'
 
 __author__ = 'Kylin Soong'
 __email__ = 'kylinsoong.1214@gmail.com'
