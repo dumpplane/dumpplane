@@ -15,7 +15,7 @@ def write_to_file(file_path, data):
         json_string = json.dumps(data, indent=4)
         with open(file_path, "w") as file:
             file.write(json_string)
-        print(f"reap to {file_path}")
+        print(f"{file_path}")
     except Exception as e:
         print(f"Error: {str(e)}")
 

@@ -10,14 +10,14 @@ from .get import get as get_exec
 from .apply import apply as apply_exec
 from .delete import delete as delete_exec
 
-def apply(credentials, type, conf_file):
-    apply_exec(credentials, type, conf_file)
+def apply(credentials, type, config):
+    apply_exec(credentials, type, config)
 
 def get(credentials, type, namespaces, console):
     get_exec(credentials, type, namespaces, console)
 
-def delete(credentials, type, conf_file):
-    delete_exec(credentials, type, conf_file)
+def delete(credentials, type, config):
+    delete_exec(credentials, type, config)
 
 def split(filename, out):
     split_exec(filename, out, True)
@@ -58,7 +58,7 @@ def parse_args(args=None):
     p = create_subparser(apply, 'apply configuration either to nginx host, or kubernetes')
     p.add_argument('credentials', help='the credentials files used to connect to kubernetes or nginx host')
     p.add_argument('-t', '--type', type=str, help='the confgiuration type, avaliable type: conf, ingress, gw, default conf')
-    p.add_argument('-f', '--file', type=str, help='the confgiuration file path')
+    p.add_argument('-f', '--config', type=str, help='the confgiuration file path')
 
     p = create_subparser(get, 'get configuration either from nginx host, or kubernetes')
     p.add_argument('credentials', help='the credentials files used to connect to kubernetes or nginx host')
@@ -69,7 +69,7 @@ def parse_args(args=None):
     p = create_subparser(delete, 'delete configuration either from nginx host, or kubernetes')
     p.add_argument('credentials', help='the credentials files used to connect to kubernetes or nginx host')
     p.add_argument('-t', '--type', type=str, help='the confgiuration type, avaliable type: conf, ingress, gw, default conf')
-    p.add_argument('-f', '--file', type=str, help='the confgiuration file path')
+    p.add_argument('-f', '--config', type=str, help='the confgiuration file path')
 
     p = create_subparser(split, 'split a nginx dump(nginx -T) .conf to raw files')
     p.add_argument('filename', help='the nginx dump(nginx -T) folder')
