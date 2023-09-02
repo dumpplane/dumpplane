@@ -7,9 +7,17 @@ from . import __version__
 from .split import split as split_exec
 from .dump import dump as dump_exec
 from .get import get as get_exec
+from .apply import apply as apply_exec
+from .delete import delete as delete_exec
+
+def apply(credentials, type, conf_file):
+    apply_exec(credentials, type, conf_file)
 
 def get(credentials, type, namespaces, console):
     get_exec(credentials, type, namespaces, console)
+
+def delete(credentials, type, conf_file):
+    delete_exec(credentials, type, conf_file)
 
 def split(filename, out):
     split_exec(filename, out, True)
@@ -47,11 +55,21 @@ def parse_args(args=None):
         p.set_defaults(_subcommand=function)
         return p
 
+    p = create_subparser(apply, 'apply configuration either to nginx host, or kubernetes')
+    p.add_argument('credentials', help='the credentials files used to connect to kubernetes or nginx host')
+    p.add_argument('-t', '--type', type=str, help='the confgiuration type, avaliable type: conf, ingress, gw, default conf')
+    p.add_argument('-f', '--file', type=str, help='the confgiuration file path')
+
     p = create_subparser(get, 'get configuration either from nginx host, or kubernetes')
     p.add_argument('credentials', help='the credentials files used to connect to kubernetes or nginx host')
     p.add_argument('-t', '--type', type=str, help='the confgiuration type, avaliable type: conf, ingress, gw, default conf')
     p.add_argument('-n', '--namespaces', type=str, help='the ccomma separated namespaces that hold ingress resource, or gateway template')
     p.add_argument('-c', '--console', type=int, help='whether output to console, if value is large 0, the get results will output to console')
+
+    p = create_subparser(delete, 'delete configuration either from nginx host, or kubernetes')
+    p.add_argument('credentials', help='the credentials files used to connect to kubernetes or nginx host')
+    p.add_argument('-t', '--type', type=str, help='the confgiuration type, avaliable type: conf, ingress, gw, default conf')
+    p.add_argument('-f', '--file', type=str, help='the confgiuration file path')
 
     p = create_subparser(split, 'split a nginx dump(nginx -T) .conf to raw files')
     p.add_argument('filename', help='the nginx dump(nginx -T) folder')
