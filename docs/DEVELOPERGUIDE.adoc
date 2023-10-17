@@ -15,9 +15,7 @@ cd p/
 [source, bash]
 .*2. Dependencies install*
 ----
-pip install elasticsearch
-pip install pymongo
-pip install kubernetes
+pip install -r requirements.txt
 ----
 
 [source, bash]
@@ -29,6 +27,14 @@ usage: dumpplane <command> [options]
 various operations for nginx config files
 
    ...
+----
+
+
+=== generator development
+
+[source, bash]
+----
+python3 -m dumpplane generator config/requests/request.txt
 ----
 
 === get development

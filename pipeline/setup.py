@@ -66,6 +66,12 @@ setup(
     author_email=__email__,
     url=__url__,
     packages=find_packages(exclude=['tests','tests.*', 'output', 'output']),
+    install_requires=[
+        'elasticsearch>=8.8.0',
+        'kubernetes>=27.2.0',
+        'pymongo>=4.3.3',
+        'pypinyin==0.49.0'
+    ],
     license=__license__,
     classifiers=[
         'Development Status :: 3 - Alpha',

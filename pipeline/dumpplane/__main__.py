@@ -9,6 +9,7 @@ from .dump import dump as dump_exec
 from .get import get as get_exec
 from .apply import apply as apply_exec
 from .delete import delete as delete_exec
+from .generator import generator as generator_exec
 
 def apply(credentials, type, config):
     apply_exec(credentials, type, config)
@@ -25,6 +26,8 @@ def split(filename, out):
 def dump(filename, input, out, db, table):
     dump_exec(filename, input, out, db, table)
 
+def generator(target):
+    generator_exec(target)
 
 class _SubparserHelpFormatter(RawDescriptionHelpFormatter):
     def _format_action(self, action):
@@ -82,6 +85,9 @@ def parse_args(args=None):
     p.add_argument('--db', type=str, help='db used to hold configurations, default nginx')
     p.add_argument('--table', type=str, help='table used to hold configurations, default configurations')
     
+    p = create_subparser(generator, 'generate nginx configuration')
+    p.add_argument('target', help='request form file, or [api], [health-check]')
+
     def help(command):
         if command not in parser._actions[-1].choices:
             parser.error('unknown command %r' % command)
