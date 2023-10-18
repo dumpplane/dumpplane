@@ -761,3 +761,34 @@ db.createView("configurationLocations", "configurationDirectives", pipeline)
 ]
 ----
 
+== NGINX Conf Generator
+
+[source, bash]
+.*1. generate nginx plus api and dashboard conf*
+----
+dumpplane generator api --port 8001 --allow 0.0.0.0/0
+----
+
+[source, bash]
+.*2. generate main nginx.conf*
+----
+dumpplane generator main
+----
+
+[source, bash]
+.*3. generate application conf*
+----
+dumpplane generator config/requests/request.txt --health_check_path /
+----
+
+[source, bash]
+.**
+----
+
+----
+
+[source, bash]
+.**
+----
+
+----

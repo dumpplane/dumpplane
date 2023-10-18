@@ -26,8 +26,8 @@ def split(filename, out):
 def dump(filename, input, out, db, table):
     dump_exec(filename, input, out, db, table)
 
-def generator(target):
-    generator_exec(target)
+def generator(target, port, allow, user, worker_processes, worker_connections, keepalive_timeout, keepalive_requests, hash_max_size, hash_bucket_size, health_check_path, enable_websocket):
+    generator_exec(target, port, allow, user, worker_processes, worker_connections, keepalive_timeout, keepalive_requests, hash_max_size, hash_bucket_size, health_check_path, enable_websocket)
 
 class _SubparserHelpFormatter(RawDescriptionHelpFormatter):
     def _format_action(self, action):
@@ -86,7 +86,19 @@ def parse_args(args=None):
     p.add_argument('--table', type=str, help='table used to hold configurations, default configurations')
     
     p = create_subparser(generator, 'generate nginx configuration')
-    p.add_argument('target', help='request form file, or [api], [health-check]')
+    p.add_argument('target', help='request form file, or [api]|[main]')
+    p.add_argument('-p', '--port', type=str, help='nginx server listen port, default 8001')
+    p.add_argument('--allow', type=str, help='nginx server allow, default 0.0.0.0/0')
+    p.add_argument('-u', '--user', type=str, help='user used to run worker processes, default nginx')
+    p.add_argument('--worker_processes', type=str, help='the number of worker processes, default auto')
+    p.add_argument('--worker_connections', type=str, help='the number of worker connections, default 1024')
+    p.add_argument('--keepalive_timeout', type=str, help='define the timeout of keepalive, default 65')
+    p.add_argument('--keepalive_requests', type=str, help='the number of keepalive requests, default 100')
+    p.add_argument('--hash_max_size', type=str, help='server name, variables hash max size, default 1024')
+    p.add_argument('--hash_bucket_size', type=str, help='server name, variables hash bucket size, default 256')
+    p.add_argument('--enable_websocket', type=str, help='enable websocket, default No')
+    p.add_argument('--health_check_path', type=str, help='set health check path')
+
 
     def help(command):
         if command not in parser._actions[-1].choices:
