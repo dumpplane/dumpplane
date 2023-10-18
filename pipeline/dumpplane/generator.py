@@ -6,7 +6,7 @@ import re
 import socket
 import ipaddress
 
-from .nginxlib import utils
+from .ngxlib import utils
 from pypinyin import pinyin, Style
 
 

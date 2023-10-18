@@ -99,22 +99,6 @@ python3 -m dumpplane dump config/conf -o http://localhost:9200
 python3 -m dumpplane dump config/conf -o http://localhost:9200 --db nginx
 ----
 
-== How to make a release
-
-[source, bash]
-.*Test*
-----
-cd tests/testwhl/ && python3 setup.py sdist bdist_wheel
-----
-
-[source, bash]
-.*Production*
-----
-python3 setup.py sdist bdist_wheel
-----
-
-`dumpplane-0.0.1-py3-none-any.whl` will generated under dist folder. 
-
 == App
 
 === Run Rate 
